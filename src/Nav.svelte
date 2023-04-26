@@ -1,22 +1,89 @@
 <script>
-    import { Link } from "svelte-routing";
-  
-    // Aquí el código javascript para añadir funcionalidad a la barra de navegación.
-    // Consultar el código fuente.
-  
-  </script>
-  
-  <nav> 
-    <!-- Se eliminan etiquetas html para resaltar lo esencial -->
-    <!-- Consulta el código fuente. -->       
-    <Link to="/">Inicio</Link>
-    <Link to="/login">Iniciar sesión</Link>
-    <Link to="/singup">Crear cuenta</Link>
-    <Link to="/profesor">Soy profesor</Link>
-    <Link to="/alumno">Soy alumno</Link>
+  import { Link } from "svelte-routing";
+</script>
+
+<div class="container-fluid g-0 mb-5">
+  <nav id="nav-scroll" class="navbar navbar-expand-lg fixed-top bg-dark">
+    <div class="container-fluid">
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNavDropdown"
+        aria-controls="navbarNavDropdown"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <i class="fa-sharp fa-solid fa-bars fa-2x" />
+      </button>
+      <ul class="navbar-nav mx-4">
+        <li class="nav-item toogle-logo">
+          <Link to="/" class="nav-link"
+            ><img
+              class="iconos-menu"
+              src="imagenes/logo.svg"
+              alt="Logo"
+            /></Link
+          >
+        </li>
+      </ul>
+      <div
+        class="menu menu-grid collapse navbar-collapse mx-4"
+        id="navbarNavDropdown"
+      >
+        <div class="navbar-nav">
+          <div class="contenido-menu toogle-contenido">
+            <div class="nav-item">
+              <Link to="/" class="nav-link">Inicio</Link>
+            </div>
+            <!-- <div class="nav-item">
+              <a class="nav-link" href="#servicios">Servicios</a>
+            </div>
+            <div class="nav-item">
+              <a class="nav-link" href="#oportunidades">Crear autoescuela</a>
+            </div>
+            <div class="nav-item">
+              <a class="nav-link" href="#contacto">Contacto</a>
+            </div> -->
+          </div>
+        </div>
+        <ul class="navbar-nav dropstart">
+          <li class="nav-item dropdown toogle-usuario">
+            <a
+              class="navbar-brand nav-link dropdown-toggle me-0"
+              href="#"
+              id="dropdownMenu"
+              data-bs-toggle="dropdown"><i class="fa-solid fa-user fa-lg" /></a
+            >
+            <ul class="dropdown-menu bg-dark" aria-labelledby="dropdownMenu">
+              <li>
+                <Link to="/login" class="dropdown-item">Iniciar sesión</Link>
+              </li>
+              <li>
+                <Link to="/singup" class="dropdown-item">Crear cuenta</Link>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="#"
+                  data-bs-toggle="modal"
+                  data-bs-target="#modalCerrarSesion">Cerrar sesión</a
+                >
+              </li>
+              <li>
+                <Link to="/account" class="dropdown-item">Mi cuenta</Link>
+              </li>
+              <li>
+                <Link to="/profesor" class="dropdown-item">Soy profesor</Link>
+              </li>
+              <li>
+                <Link to="/alumno" class="dropdown-item">Soy alumno</Link>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
   </nav>
-  
-  <style>
-    /* Aquí el código CSS para diseño responsive de la barra de navegación. */
-    /* Consultar el código fuente */
-  </style>
+</div>
+<br />

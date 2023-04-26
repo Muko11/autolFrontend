@@ -3,10 +3,13 @@
 	import { Router } from "svelte-routing";
 	import Nav from "./Nav.svelte";
 	import Contenido from "./Contenido.svelte";
+	import Footer from "./Footer.svelte";
 
 	const URL = {
-		/* articulos: "https://tiendabackend.fly.dev/api/articulos/",
-		clientes: "https://tiendabackend.fly.dev/api/clientes/", */
+		usuarios: "http://localhost:3000/autol/usuarios/",
+		login: "http://localhost:3000/autol/login/",
+		singup: "http://localhost:3000/autol/singup/",
+		account: "http://localhost:3000/autol/account/",
 	};
 
 	setContext("URL", URL);
@@ -15,8 +18,5 @@
 <Router>
 	<Nav />
 	<Contenido />
+	<Footer />
 </Router>
-
-<style>
-
-</style>
