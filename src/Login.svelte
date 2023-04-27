@@ -4,6 +4,55 @@
 
   const URL = getContext("URL");
 
+  let loginSuccess = false;
+  let loginMessage = "";
+
+  /* async function login(correo, password) {
+    const response = await fetch(URL.login, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        correo,
+        password,
+      }),
+    });
+
+    const data = await response.json();
+    loginSuccess = data.success;
+    loginMessage = data.message;
+  } */
+
+  async function login(correo, password) {
+    const response = await fetch(URL.login, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        correo,
+        password,
+      }),
+    });
+
+    const data = await response.json();
+    loginSuccess = data.success;
+    loginMessage = data.message;
+
+    if (data.success) {
+      const user = {
+        id_usuario: data.id_usuario,
+        nombre: data.nombre,
+        apellidos: data.apellidos,
+        correo: data.correo,
+        rol: data.rol,
+      };
+      localStorage.setItem("user", JSON.stringify(user));
+      window.location.href = "/";
+    }
+  }
+
   async function handleFormSubmit(event) {
     event.preventDefault(); // Evitar que se envíe el formulario
 
@@ -14,21 +63,8 @@
     const password = form.password.value;
 
     try {
-      // Realizar una solicitud POST a la URL deseada con los datos del formulario
-      const response = await fetch(URL.login, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          correo,
-          password,
-        }),
-      });
-
-      // Manejar la respuesta de la solicitud
-      const data = await response.json();
-      console.log(data);
+      // Llamar a la función login con el correo y la contraseña
+      await login(correo, password);
     } catch (error) {
       console.error(error);
     }
@@ -37,6 +73,27 @@
 
 <div class="container my-5">
   <Link to="/" class="boton my-4">⬅ Volver</Link>
+</div>
+<div class="container">
+  {#if loginSuccess}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      {loginMessage}<button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+      />
+    </div>
+  {:else if loginMessage !== ""}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {loginMessage}<button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+      />
+    </div>
+  {/if}
 </div>
 
 <div class="container formulario">

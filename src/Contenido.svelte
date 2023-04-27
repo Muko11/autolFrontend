@@ -6,6 +6,7 @@
   import Singup from "./Singup.svelte";
   import Login from "./Login.svelte";
   import Account from "./Account.svelte";
+  import Logout from "./Logout.svelte";
 </script>
 
 <main>
@@ -15,6 +16,7 @@
   <Route path="/login" component={Login} />
   <Route path="/singup" component={Singup} />
   <Route path="/account" component={Account} />
+  <Route path="/logout" component={Logout} />
   <Route path="/profesor" component={Profesor} />
   <Route path="/alumno" component={Alumno} />
 </main>

@@ -1,5 +1,23 @@
 <script>
   import { Link } from "svelte-routing";
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const nombreLogin = user.nombre;
+
+    // Obtener el elemento 'a'
+    const navbarBrand = document.querySelector(".navbar-brand");
+
+    // Obtener el nombre de usuario de la sesión
+    const nombreUsuario = nombreLogin;
+
+    // Actualizar el contenido del elemento 'a'
+    navbarBrand.innerHTML = nombreUsuario;
+
+    // Poner un subrayado al elemento
+    navbarBrand.style.textDecoration = "underline";
+  });
+
 </script>
 
 <div class="container-fluid g-0 mb-5">
@@ -63,12 +81,7 @@
                 <Link to="/singup" class="dropdown-item">Crear cuenta</Link>
               </li>
               <li>
-                <a
-                  class="dropdown-item"
-                  href="#"
-                  data-bs-toggle="modal"
-                  data-bs-target="#modalCerrarSesion">Cerrar sesión</a
-                >
+                <Link to="/logout" class="dropdown-item">Cerrar sesión</Link>
               </li>
               <li>
                 <Link to="/account" class="dropdown-item">Mi cuenta</Link>

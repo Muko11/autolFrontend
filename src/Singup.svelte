@@ -17,7 +17,6 @@
     const rol = form.rol.value;
 
     try {
-      // Realizar una solicitud POST a la URL deseada con los datos del formulario
       const response = await fetch(URL.singup, {
         method: "POST",
         headers: {
@@ -32,9 +31,8 @@
         }),
       });
 
-      // Manejar la respuesta de la solicitud
       const data = await response.json();
-      console.log(data);
+      window.location.href = "/login";
     } catch (error) {
       console.error(error);
     }

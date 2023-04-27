@@ -5,14 +5,11 @@
 
   const URL = getContext("URL");
 
-  let usuario = {};
-
-  onMount(async () => {
-    const response = await fetch(URL.usuarios + "" );
-    if (response.ok) {
-      usuario = await response.json();
-    }
-  });
+  const user = JSON.parse(localStorage.getItem("user"));
+  const nombre = user.nombre;
+  const apellidos = user.apellidos;
+  const rol = user.rol;
+  const correo = user.correo;
 </script>
 
 <div class="container my-5">
@@ -20,14 +17,14 @@
 </div>
 
 <div class="container formulario">
-  <p class="fs-3">Bienvenid@, {usuario.nombre}</p>
+  <p class="fs-3">Bienvenid@, {nombre}</p>
   <p class="text-muted">Datos de tu cuenta</p>
 
   <div class="card">
     <div class="card-body">
-      <h5 class="card-title">{usuario.nombre} {usuario.apellidos}</h5>
-      <p class="card-text"><b>Tipo de cuenta:</b> {usuario.rol}</p>
-      <p class="card-text"><b>Correo electrónico:</b> {usuario.correo}</p>
+      <h5 class="card-title">{nombre} {apellidos}</h5>
+      <p class="card-text"><b>Tipo de cuenta:</b> {rol}</p>
+      <p class="card-text"><b>Correo electrónico:</b> {correo}</p>
     </div>
   </div>
 </div>
