@@ -1,10 +1,101 @@
+<script>
+  import { getContext } from "svelte";
+
+  const URL = getContext("URL");
+
+  let user = JSON.parse(localStorage.getItem("user"));
+  let isProfessor = user && user.rol === "profesor";
+
+  async function handleFormSubmit(event) {
+    event.preventDefault(); // Evitar que se envíe el formulario
+
+    const form = event.target; // Obtener el formulario actual
+
+    // Obtener los valores de los campos de entrada
+    const nombre = form.nombre.value;
+    const telefono = form.telefono.value;
+    const precio_practica = form.precio_practica.value;
+
+    try {
+      const response = await fetch(URL.autoescuela, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre,
+          telefono,
+          precio_practica,
+        }),
+      });
+
+      const data = await response.json();
+      const id_autoescuela = data.id_autoescuela;
+      const user = JSON.parse(localStorage.getItem("user"));
+      const id_profesor = user.id_usuario;
+
+      try {
+        const response2 = await fetch(
+          URL.profesor + id_profesor + "/" + id_autoescuela,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data2 = await response2.json();
+
+        if (data2.error) {
+          // El profesor ya pertenece a una autoescuela
+          alert("El profesor ya pertenece a una autoescuela");
+        } else {
+          // El profesor ha sido insertado correctamente
+          user.id_autoescuela = id_autoescuela;
+          localStorage.setItem("user", JSON.stringify(user));
+
+          try {
+            const response3 = await fetch(
+              URL.autoescuela + id_autoescuela + "/" + id_profesor,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+
+            const data3 = await response3.json();
+
+            if (data3.error) {
+              alert("Error al asignar el profesor como administrador");
+            } else {
+              // La autoescuela ha sido creada correctamente
+              window.location.href = "/";
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+</script>
+
 <!-- Portada -->
 <div class="d-flex justify-content-center align-items-center portada">
   <div class="container position-relative">
     <h1 id="inicio">AutoL - Organiza tu autoescuela</h1>
     <h2>Software para la gestión de autoescuelas. ¡Comienza ahora!</h2>
     <br />
-    <a href="#oportunidades" class="boton btn-portada">Comenzar</a>
+    {#if isProfessor}
+      <a href="#oportunidades" class="boton btn-portada">Comenzar</a>
+    {/if}
   </div>
 </div>
 
@@ -55,62 +146,70 @@
 </div>
 
 <!-- Tarjetas profesor, alumno, autoescuela -->
-<div id="oportunidades" />
-<br />
-<br />
+{#if isProfessor}
+  <div id="oportunidades" />
+  <br />
+  <br />
 
-<div class="container-fluid px-4 py-5 contenedor-autoescuela">
-  <h3 class="text-center m-3">CREA TU AUTOESCUELA</h3>
-  <div class="container-fluid px-md-5 px-sm-2 mt-4">
-    <div class="row row-cols row-cols-md-2 align-items-center">
-      <div class="d-flex justify-content-center mb-4">
-        <img class="w-50" src="imagenes/autoescuela.png" alt="Autoescuela" />
+  <div class="container-fluid px-4 py-5 contenedor-autoescuela">
+    <h3 class="text-center m-3">CREA TU AUTOESCUELA</h3>
+    <div class="container-fluid px-md-5 px-sm-2 mt-4">
+      <div class="row row-cols row-cols-md-2 align-items-center">
+        <div class="d-flex justify-content-center mb-4">
+          <img class="w-50" src="imagenes/autoescuela.png" alt="Autoescuela" />
+        </div>
+
+        <form
+          id="formulario-autoescuela"
+          class="p-4"
+          on:submit={handleFormSubmit}
+        >
+          <h4 class="fw-bold mb-4 text-center">
+            Rellena el formulario para crear tu autoescuela
+          </h4>
+          <div class="form-floating mb-3">
+            <input
+              type="text"
+              class="form-control"
+              id="modalNombreAutoescuela"
+              name="nombre"
+              placeholder="Nombre de la autoescuela"
+            />
+            <label for="modalNombreAutoescuela">Nombre de la autoescuela</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="number"
+              class="form-control"
+              id="modalTelefono"
+              name="telefono"
+              placeholder="Teléfono"
+            />
+            <label for="modalTelefono">Teléfono</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="number"
+              class="form-control"
+              id="modalPrecio"
+              name="precio_practica"
+              placeholder="Precio por clase práctica"
+            />
+            <label for="modalPrecio">Precio por clase práctica</label>
+          </div>
+          <div class="d-flex justify-content-center mb-3">
+            <input
+              id="submitAutoescuela"
+              class="boton"
+              type="submit"
+              value="Crear autoescuela"
+            />
+          </div>
+        </form>
       </div>
-
-      <form id="formulario-autoescuela" class="p-4">
-        <h4 class="fw-bold mb-4 text-center">
-          Rellena el formulario para crear tu autoescuela
-        </h4>
-        <div class="form-floating mb-3">
-          <input
-            type="text"
-            class="form-control"
-            id="modalNombreAutoescuela"
-            placeholder="Nombre de la autoescuela"
-          />
-          <label for="modalNombreAutoescuela">Nombre de la autoescuela</label>
-        </div>
-        <div class="form-floating mb-3">
-          <input
-            type="number"
-            class="form-control"
-            id="modalTelefono"
-            placeholder="Teléfono"
-          />
-          <label for="modalTelefono">Teléfono</label>
-        </div>
-        <div class="form-floating mb-3">
-          <input
-            type="number"
-            class="form-control"
-            id="modalPrecio"
-            placeholder="Precio por clase práctica"
-          />
-          <label for="modalPrecio">Precio por clase práctica</label>
-        </div>
-        <div class="d-flex justify-content-center mb-3">
-          <input
-            id="submitAutoescuela"
-            class="boton"
-            type="submit"
-            value="Crear autoescuela"
-          />
-        </div>
-      </form>
     </div>
   </div>
-</div>
-
+{/if}
 <!-- Contacto -->
 <div id="contacto" />
 <br />

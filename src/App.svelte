@@ -10,9 +10,12 @@
 		login: "http://localhost:3000/autol/login/",
 		singup: "http://localhost:3000/autol/singup/",
 		account: "http://localhost:3000/autol/account/",
+		autoescuela: "http://localhost:3000/autol/autoescuela/",
+		profesor: "http://localhost:3000/autol/profesor/",
 	};
 
 	setContext("URL", URL);
+
 </script>
 
 <Router>

@@ -1,5 +1,19 @@
 <script>
   import { Link } from "svelte-routing";
+  import { onMount } from "svelte";
+
+  let isLogged;
+  let isProfessor;
+
+  onMount(() => {
+    // Verificar si hay un usuario en sesión al cargar la página
+    const user = JSON.parse(localStorage.getItem("user"));
+    isLogged = !!user;
+
+    if (isLogged) {
+      isProfessor = user.rol === "profesor";
+    }
+  });
 
   document.addEventListener("DOMContentLoaded", function () {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -17,7 +31,6 @@
     // Poner un subrayado al elemento
     navbarBrand.style.textDecoration = "underline";
   });
-
 </script>
 
 <div class="container-fluid g-0 mb-5">
@@ -54,15 +67,17 @@
             <div class="nav-item">
               <Link to="/" class="nav-link">Inicio</Link>
             </div>
-            <!-- <div class="nav-item">
+            <div class="nav-item">
               <a class="nav-link" href="#servicios">Servicios</a>
             </div>
-            <div class="nav-item">
-              <a class="nav-link" href="#oportunidades">Crear autoescuela</a>
-            </div>
+            {#if isProfessor}
+              <div class="nav-item">
+                <a class="nav-link" href="#oportunidades">Crear autoescuela</a>
+              </div>
+            {/if}
             <div class="nav-item">
               <a class="nav-link" href="#contacto">Contacto</a>
-            </div> -->
+            </div>
           </div>
         </div>
         <ul class="navbar-nav dropstart">
@@ -74,24 +89,32 @@
               data-bs-toggle="dropdown"><i class="fa-solid fa-user fa-lg" /></a
             >
             <ul class="dropdown-menu bg-dark" aria-labelledby="dropdownMenu">
-              <li>
-                <Link to="/login" class="dropdown-item">Iniciar sesión</Link>
-              </li>
-              <li>
-                <Link to="/singup" class="dropdown-item">Crear cuenta</Link>
-              </li>
-              <li>
-                <Link to="/logout" class="dropdown-item">Cerrar sesión</Link>
-              </li>
-              <li>
-                <Link to="/account" class="dropdown-item">Mi cuenta</Link>
-              </li>
-              <li>
-                <Link to="/profesor" class="dropdown-item">Soy profesor</Link>
-              </li>
-              <li>
-                <Link to="/alumno" class="dropdown-item">Soy alumno</Link>
-              </li>
+              {#if !isLogged}
+                <li>
+                  <Link to="/login" class="dropdown-item">Iniciar sesión</Link>
+                </li>
+                <li>
+                  <Link to="/singup" class="dropdown-item">Crear cuenta</Link>
+                </li>
+              {:else}
+                <li>
+                  <Link to="/account" class="dropdown-item">Mi cuenta</Link>
+                </li>
+                {#if isProfessor}
+                  <li>
+                    <Link to="/profesor" class="dropdown-item"
+                      >Soy profesor</Link
+                    >
+                  </li>
+                {:else}
+                  <li>
+                    <Link to="/alumno" class="dropdown-item">Soy alumno</Link>
+                  </li>
+                {/if}
+                <li>
+                  <Link to="/logout" class="dropdown-item">Cerrar sesión</Link>
+                </li>
+              {/if}
             </ul>
           </li>
         </ul>
