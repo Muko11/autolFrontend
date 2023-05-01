@@ -1,3 +1,119 @@
+<script>
+  import { onMount } from "svelte";
+  import { getContext } from "svelte";
+
+  const URL = getContext("URL");
+  const user = JSON.parse(localStorage.getItem("user"));
+  const id_usuario = user.id_usuario;
+  const id_autoescuela = user.id_autoescuela;
+  let es_administrador = false; // inicialmente el usuario no es administrador
+
+  let nombreAutoescuela = "";
+  let telefonoAutoescuela = "";
+  let practicaAutoescuela = "";
+
+  // función para verificar si el usuario es administrador de la autoescuela
+  const verificarAdministrador = (autoescuela) => {
+    if (autoescuela.id_administrador === id_usuario) {
+      es_administrador = true; // el usuario es administrador
+    }
+  };
+
+  onMount(async () => {
+    try {
+      const response = await fetch(URL.autoescuela + id_usuario);
+      const autoescuela = await response.json();
+      nombreAutoescuela = autoescuela.nombre;
+      telefonoAutoescuela = autoescuela.telefono;
+      practicaAutoescuela = autoescuela.precio_practica;
+
+      // verificar si el usuario es administrador de la autoescuela
+      verificarAdministrador(autoescuela);
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
+  const submitForm = async (event) => {
+    event.preventDefault();
+
+    // Obtener los valores actualizados de los campos del formulario
+    const nombre = document.getElementById("nombreAutoescuela").value;
+    const telefono = document.getElementById("telefonoAutoescuela").value;
+    const precioPractica = document.getElementById("practicaAutoescuela").value;
+
+    try {
+      // Enviar los datos actualizados al servidor
+      const response = await fetch(URL.autoescuela + id_usuario, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre: nombre,
+          telefono: telefono,
+          precio_practica: precioPractica,
+        }),
+      });
+
+      // Si la respuesta del servidor es exitosa, actualizar los valores de la autoescuela y los campos del formulario
+      if (response.ok) {
+        const updatedAutoescuela = await response.json();
+        nombreAutoescuela = updatedAutoescuela.nombre;
+        telefonoAutoescuela = updatedAutoescuela.telefono;
+        practicaAutoescuela = updatedAutoescuela.precio_practica;
+        document.getElementById("nombreAutoescuela").value = nombreAutoescuela;
+        document.getElementById("telefonoAutoescuela").value =
+          telefonoAutoescuela;
+        document.getElementById("practicaAutoescuela").value =
+          practicaAutoescuela;
+      } else {
+        console.error(
+          "Error en la actualización de la información de la autoescuela"
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  let emailProfesor = "";
+
+  async function handleSubmit(event) {
+    event.preventDefault(); // evita que el formulario se envíe automáticamente
+
+    try {
+      // Consultar si el usuario es rol profesor
+      const response = await fetch(`${URL.usuarios}?correo=${emailProfesor}`);
+      const data = await response.json();
+      const usuario = data[0];
+
+      if (!usuario || usuario.rol !== "profesor") {
+        throw new Error(
+          "El correo ingresado no pertenece a un usuario con rol profesor"
+        );
+      }
+
+      // Insertar al profesor en la autoescuela correspondiente
+      const response2 = await fetch(
+        `${URL.profesor}${usuario.id_usuario}/${id_autoescuela}`,
+        {
+          method: "POST",
+        }
+      );
+      const data2 = await response2.json();
+
+      console.log(data2);
+
+      // Mostrar mensaje de éxito
+      setSuccessMessage("Profesor agregado correctamente");
+    } catch (error) {
+      console.error(error.message);
+      setErrorMessage(error.message);
+    }
+  }
+</script>
+
 <!-- Nav lateral -->
 <div class="container-fluid panelContenido">
   <div class="row my-3">
@@ -77,11 +193,7 @@
 
             <div class="tab-pane fade show active px-4" id="nav-autoescuela">
               <h4 class="mb-4">Datos de la autoescuela</h4>
-              <form
-                class="mb-5"
-                method="POST"
-                action="forms/actualizaDatosAutoescuela.php"
-              >
+              <form class="mb-5" on:submit={submitForm}>
                 <div class="row row-cols-1 row-cols-md-1 row-cols-lg-3">
                   <div class="mb-4">
                     <label for="nombreAutoescuela" class="fw-bold mb-2"
@@ -91,8 +203,9 @@
                       type="text"
                       class="form-control"
                       id="nombreAutoescuela"
-                      name="autoescuela"
+                      name="nombreAutoescuela"
                       placeholder="Nombre de la autoescuela"
+                      bind:value={nombreAutoescuela}
                     />
                   </div>
                   <div class="mb-4">
@@ -103,8 +216,9 @@
                       type="tel"
                       class="form-control"
                       id="telefonoAutoescuela"
-                      name="telefono"
+                      name="telefonoAutoescuela"
                       placeholder="Teléfono"
+                      bind:value={telefonoAutoescuela}
                     />
                   </div>
                   <div class="mb-4">
@@ -115,8 +229,9 @@
                       type="text"
                       class="form-control"
                       id="practicaAutoescuela"
-                      name="precio"
+                      name="practicaAutoescuela"
                       placeholder="Precio por clase práctica"
+                      bind:value={practicaAutoescuela}
                     />
                   </div>
                 </div>
@@ -129,7 +244,7 @@
                     value="Guardar cambios"
                   />
                 </div>
-
+                <br />
                 <div class="d-flex justify-content-end">
                   <a
                     href="#"
@@ -149,11 +264,7 @@
 
               <!-- <a href="#" data-bs-toggle="modal" data-bs-target="#modalAñadirProfesor"><i class="fa-solid fa-user-plus fa-2x i-añadir"></i></a> -->
 
-              <form
-                class="mb-5"
-                method="POST"
-                action="forms/procesarProfesor.php"
-              >
+              <form class="mb-5" on:submit={handleSubmit}>
                 <div class="row row-cols row-cols-md-2">
                   <div class="mb-4">
                     <label for="emailProfesor" class="fw-bold mb-2"
@@ -163,7 +274,7 @@
                       type="email"
                       class="form-control"
                       id="emailProfesor"
-                      name="emailProfesor"
+                      bind:value={emailProfesor}
                       placeholder="Correo del profesor"
                     />
                   </div>

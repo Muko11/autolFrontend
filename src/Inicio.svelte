@@ -6,7 +6,7 @@
   let user = JSON.parse(localStorage.getItem("user"));
   let isProfessor = user && user.rol === "profesor";
 
-  async function handleFormSubmit(event) {
+  /* async function handleFormSubmit(event) {
     event.preventDefault(); // Evitar que se envíe el formulario
 
     const form = event.target; // Obtener el formulario actual
@@ -52,6 +52,92 @@
           alert("El profesor ya pertenece a una autoescuela");
         } else {
           // El profesor ha sido insertado correctamente
+          user.id_autoescuela = id_autoescuela;
+          localStorage.setItem("user", JSON.stringify(user));
+
+          try {
+            const response3 = await fetch(
+              URL.autoescuela + id_autoescuela + "/" + id_profesor,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+
+            const data3 = await response3.json();
+
+            if (data3.error) {
+              alert("Error al asignar el profesor como administrador");
+            } else {
+              // La autoescuela ha sido creada correctamente
+              window.location.href = "/";
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  } */
+
+  async function handleFormSubmit(event) {
+    event.preventDefault(); // Evitar que se envíe el formulario
+
+    const form = event.target; // Obtener el formulario actual
+
+    // Obtener los valores de los campos de entrada
+    const nombre = form.nombre.value;
+    const telefono = form.telefono.value;
+    const precio_practica = form.precio_practica.value;
+
+    const user = JSON.parse(localStorage.getItem("user"));
+    const id_profesor = user.id_usuario;
+
+    // Verificar si el profesor ya pertenece a una autoescuela
+    if (user.id_autoescuela) {
+      alert("Ya perteneces a una autoescuela");
+      return;
+    }
+
+    try {
+      const response = await fetch(URL.autoescuela, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre,
+          telefono,
+          precio_practica,
+        }),
+      });
+
+      const data = await response.json();
+      const id_autoescuela = data.id_autoescuela;
+
+      try {
+        const response2 = await fetch(
+          URL.profesor + id_profesor + "/" + id_autoescuela,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data2 = await response2.json();
+
+        if (data2.error) {
+          alert("Error al asignar el profesor a la autoescuela");
+        } else {
+          // Actualizar el objeto user con la id_autoescuela
           user.id_autoescuela = id_autoescuela;
           localStorage.setItem("user", JSON.stringify(user));
 

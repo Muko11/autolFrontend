@@ -68,15 +68,15 @@
               <Link to="/" class="nav-link">Inicio</Link>
             </div>
             <div class="nav-item">
-              <a class="nav-link" href="#servicios">Servicios</a>
+              <a class="nav-link" href="/#servicios">Servicios</a>
             </div>
             {#if isProfessor}
               <div class="nav-item">
-                <a class="nav-link" href="#oportunidades">Crear autoescuela</a>
+                <a class="nav-link" href="/#oportunidades">Crear autoescuela</a>
               </div>
             {/if}
             <div class="nav-item">
-              <a class="nav-link" href="#contacto">Contacto</a>
+              <a class="nav-link" href="/#contacto">Contacto</a>
             </div>
           </div>
         </div>

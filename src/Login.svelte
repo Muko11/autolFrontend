@@ -53,59 +53,50 @@
     }
   } */
 
-
-
-//ESTO ES UNA VEZ SEA CAPAZ DE ACTUALIZAR EL ID DEL ADMINISTRADOR
+  //ESTO ES UNA VEZ SEA CAPAZ DE ACTUALIZAR EL ID DEL ADMINISTRADOR
   async function login(correo, password) {
-  const response = await fetch(URL.login, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      correo,
-      password,
-    }),
-  });
+    const response = await fetch(URL.login, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        correo,
+        password,
+      }),
+    });
 
-  const data = await response.json();
-  loginSuccess = data.success;
-  loginMessage = data.message;
+    const data = await response.json();
+    loginSuccess = data.success;
+    loginMessage = data.message;
 
-  if (data.success) {
-    const user = {
-      id_usuario: data.id_usuario,
-      nombre: data.nombre,
-      apellidos: data.apellidos,
-      correo: data.correo,
-      rol: data.rol,
-    };
+    if (data.success) {
+      const user = {
+        id_usuario: data.id_usuario,
+        nombre: data.nombre,
+        apellidos: data.apellidos,
+        correo: data.correo,
+        rol: data.rol,
+      };
 
-    try {
-      const response = await fetch(URL.autoescuela + user.id_usuario, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      try {
+        const response = await fetch(URL.autoescuela + user.id_usuario, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-      const data = await response.json();
-      const id_autoescuela = data.id_autoescuela;
-      user.id_autoescuela = id_autoescuela;
-      localStorage.setItem("user", JSON.stringify(user));
-      window.location.href = "/";
-    } catch (error) {
-      console.error(error);
+        const data = await response.json();
+        const id_autoescuela = data.id_autoescuela;
+        user.id_autoescuela = id_autoescuela;
+        localStorage.setItem("user", JSON.stringify(user));
+        window.location.href = "/";
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
-}
-
-
-
-
-
-
-
 
   async function handleFormSubmit(event) {
     event.preventDefault(); // Evitar que se envíe el formulario
