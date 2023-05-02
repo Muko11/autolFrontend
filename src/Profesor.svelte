@@ -6,29 +6,19 @@
   const user = JSON.parse(localStorage.getItem("user"));
   const id_usuario = user.id_usuario;
   const id_autoescuela = user.id_autoescuela;
-  let es_administrador = false; // inicialmente el usuario no es administrador
 
   let nombreAutoescuela = "";
   let telefonoAutoescuela = "";
   let practicaAutoescuela = "";
 
-  // función para verificar si el usuario es administrador de la autoescuela
-  const verificarAdministrador = (autoescuela) => {
-    if (autoescuela.id_administrador === id_usuario) {
-      es_administrador = true; // el usuario es administrador
-    }
-  };
 
   onMount(async () => {
     try {
-      const response = await fetch(URL.autoescuela + id_usuario);
+      const response = await fetch(URL.autoescuela + id_autoescuela);
       const autoescuela = await response.json();
       nombreAutoescuela = autoescuela.nombre;
       telefonoAutoescuela = autoescuela.telefono;
       practicaAutoescuela = autoescuela.precio_practica;
-
-      // verificar si el usuario es administrador de la autoescuela
-      verificarAdministrador(autoescuela);
     } catch (error) {
       console.error(error);
     }
@@ -62,7 +52,7 @@
         nombreAutoescuela = updatedAutoescuela.nombre;
         telefonoAutoescuela = updatedAutoescuela.telefono;
         practicaAutoescuela = updatedAutoescuela.precio_practica;
-        document.getElementById("nombreAutoescuela").value = nombreAutoescuela;
+                document.getElementById("nombreAutoescuela").value = nombreAutoescuela;
         document.getElementById("telefonoAutoescuela").value =
           telefonoAutoescuela;
         document.getElementById("practicaAutoescuela").value =

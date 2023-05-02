@@ -233,68 +233,76 @@
 
 <!-- Tarjetas profesor, alumno, autoescuela -->
 {#if isProfessor}
-  <div id="oportunidades" />
-  <br />
-  <br />
+  {#if !user.id_autoescuela}
+    <div id="oportunidades" />
+    <br />
+    <br />
 
-  <div class="container-fluid px-4 py-5 contenedor-autoescuela">
-    <h3 class="text-center m-3">CREA TU AUTOESCUELA</h3>
-    <div class="container-fluid px-md-5 px-sm-2 mt-4">
-      <div class="row row-cols row-cols-md-2 align-items-center">
-        <div class="d-flex justify-content-center mb-4">
-          <img class="w-50" src="imagenes/autoescuela.png" alt="Autoescuela" />
+    <div class="container-fluid px-4 py-5 contenedor-autoescuela">
+      <h3 class="text-center m-3">CREA TU AUTOESCUELA</h3>
+      <div class="container-fluid px-md-5 px-sm-2 mt-4">
+        <div class="row row-cols row-cols-md-2 align-items-center">
+          <div class="d-flex justify-content-center mb-4">
+            <img
+              class="w-50"
+              src="imagenes/autoescuela.png"
+              alt="Autoescuela"
+            />
+          </div>
+
+          <form
+            id="formulario-autoescuela"
+            class="p-4"
+            on:submit={handleFormSubmit}
+          >
+            <h4 class="fw-bold mb-4 text-center">
+              Rellena el formulario para crear tu autoescuela
+            </h4>
+            <div class="form-floating mb-3">
+              <input
+                type="text"
+                class="form-control"
+                id="modalNombreAutoescuela"
+                name="nombre"
+                placeholder="Nombre de la autoescuela"
+              />
+              <label for="modalNombreAutoescuela"
+                >Nombre de la autoescuela</label
+              >
+            </div>
+            <div class="form-floating mb-3">
+              <input
+                type="number"
+                class="form-control"
+                id="modalTelefono"
+                name="telefono"
+                placeholder="Teléfono"
+              />
+              <label for="modalTelefono">Teléfono</label>
+            </div>
+            <div class="form-floating mb-3">
+              <input
+                type="number"
+                class="form-control"
+                id="modalPrecio"
+                name="precio_practica"
+                placeholder="Precio por clase práctica"
+              />
+              <label for="modalPrecio">Precio por clase práctica</label>
+            </div>
+            <div class="d-flex justify-content-center mb-3">
+              <input
+                id="submitAutoescuela"
+                class="boton"
+                type="submit"
+                value="Crear autoescuela"
+              />
+            </div>
+          </form>
         </div>
-
-        <form
-          id="formulario-autoescuela"
-          class="p-4"
-          on:submit={handleFormSubmit}
-        >
-          <h4 class="fw-bold mb-4 text-center">
-            Rellena el formulario para crear tu autoescuela
-          </h4>
-          <div class="form-floating mb-3">
-            <input
-              type="text"
-              class="form-control"
-              id="modalNombreAutoescuela"
-              name="nombre"
-              placeholder="Nombre de la autoescuela"
-            />
-            <label for="modalNombreAutoescuela">Nombre de la autoescuela</label>
-          </div>
-          <div class="form-floating mb-3">
-            <input
-              type="number"
-              class="form-control"
-              id="modalTelefono"
-              name="telefono"
-              placeholder="Teléfono"
-            />
-            <label for="modalTelefono">Teléfono</label>
-          </div>
-          <div class="form-floating mb-3">
-            <input
-              type="number"
-              class="form-control"
-              id="modalPrecio"
-              name="precio_practica"
-              placeholder="Precio por clase práctica"
-            />
-            <label for="modalPrecio">Precio por clase práctica</label>
-          </div>
-          <div class="d-flex justify-content-center mb-3">
-            <input
-              id="submitAutoescuela"
-              class="boton"
-              type="submit"
-              value="Crear autoescuela"
-            />
-          </div>
-        </form>
       </div>
     </div>
-  </div>
+  {/if}
 {/if}
 <!-- Contacto -->
 <div id="contacto" />
