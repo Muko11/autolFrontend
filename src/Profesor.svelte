@@ -7,69 +7,62 @@
   const id_usuario = user.id_usuario;
   const id_autoescuela = user.id_autoescuela;
 
-  let nombreAutoescuela = "";
-  let telefonoAutoescuela = "";
-  let practicaAutoescuela = "";
-
+  let nombre = "";
+  let telefono = "";
+  let practica = "";
 
   onMount(async () => {
     try {
-      const response = await fetch(URL.autoescuela + id_autoescuela);
+      const response = await fetch(URL.autoescuela + id_usuario);
       const autoescuela = await response.json();
-      nombreAutoescuela = autoescuela.nombre;
-      telefonoAutoescuela = autoescuela.telefono;
-      practicaAutoescuela = autoescuela.precio_practica;
+      nombre = autoescuela.nombre;
+      telefono = autoescuela.telefono;
+      practica = autoescuela.precio_practica;
     } catch (error) {
       console.error(error);
     }
   });
 
-  const submitForm = async (event) => {
+  async function handleSubmit(event) {
     event.preventDefault();
 
-    // Obtener los valores actualizados de los campos del formulario
-    const nombre = document.getElementById("nombreAutoescuela").value;
-    const telefono = document.getElementById("telefonoAutoescuela").value;
-    const precioPractica = document.getElementById("practicaAutoescuela").value;
+    const form = event.target;
+    const { nombreAutoescuela, telefonoAutoescuela, practicaAutoescuela } =
+      form.elements;
 
-    try {
-      // Enviar los datos actualizados al servidor
-      const response = await fetch(URL.autoescuela + id_usuario, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nombre: nombre,
-          telefono: telefono,
-          precio_practica: precioPractica,
-        }),
-      });
+    const data = {
+      nombre: nombreAutoescuela.value,
+      telefono: telefonoAutoescuela.value,
+      precio_practica: practicaAutoescuela.value,
+    };
 
-      // Si la respuesta del servidor es exitosa, actualizar los valores de la autoescuela y los campos del formulario
-      if (response.ok) {
-        const updatedAutoescuela = await response.json();
-        nombreAutoescuela = updatedAutoescuela.nombre;
-        telefonoAutoescuela = updatedAutoescuela.telefono;
-        practicaAutoescuela = updatedAutoescuela.precio_practica;
-                document.getElementById("nombreAutoescuela").value = nombreAutoescuela;
-        document.getElementById("telefonoAutoescuela").value =
-          telefonoAutoescuela;
-        document.getElementById("practicaAutoescuela").value =
-          practicaAutoescuela;
-      } else {
-        console.error(
-          "Error en la actualización de la información de la autoescuela"
-        );
-      }
-    } catch (error) {
-      console.error(error);
+    const response = await fetch(URL.autoescuela + id_usuario, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (response.ok) {
+      // Actualizar los campos del formulario con los nuevos datos
+      const newData = await response.json();
+      nombreAutoescuela.value = newData.nombre;
+      telefonoAutoescuela.value = newData.telefono;
+      practicaAutoescuela.value = newData.precio_practica;
+
+      // Mostrar el toast
+      const toast = document.querySelector(".toast");
+      toast.classList.add("show");
+    } else {
+      // Manejar errores
+      console.error("Ha ocurrido un error al actualizar la autoescuela");
     }
-  };
+  }
 
   let emailProfesor = "";
 
-  async function handleSubmit(event) {
+  /* async function handleSubmit(event) {
     event.preventDefault(); // evita que el formulario se envíe automáticamente
 
     try {
@@ -101,7 +94,7 @@
       console.error(error.message);
       setErrorMessage(error.message);
     }
-  }
+  } */
 </script>
 
 <!-- Nav lateral -->
@@ -182,8 +175,27 @@
             <!-- Aside - Código autoescuela -->
 
             <div class="tab-pane fade show active px-4" id="nav-autoescuela">
-              <h4 class="mb-4">Datos de la autoescuela</h4>
-              <form class="mb-5" on:submit={submitForm}>
+              <div class="row row-cols-sm-2 row-cols-md-2 d-flex justify-content-between mb-4">
+                <h4>Datos de la autoescuela</h4>
+                <div
+                  class="toast align-items-center text-bg-success border-0"
+                  role="alert"
+                  aria-live="assertive"
+                  aria-atomic="true"
+                >
+                  <div class="d-flex">
+                    <div class="toast-body">Datos actualizados correctamente</div>
+                    <button
+                      type="button"
+                      class="btn-close btn-close-white me-2 m-auto"
+                      data-bs-dismiss="toast"
+                      aria-label="Close"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <form class="mb-5" on:submit={handleSubmit}>
                 <div class="row row-cols-1 row-cols-md-1 row-cols-lg-3">
                   <div class="mb-4">
                     <label for="nombreAutoescuela" class="fw-bold mb-2"
@@ -193,9 +205,9 @@
                       type="text"
                       class="form-control"
                       id="nombreAutoescuela"
-                      name="nombreAutoescuela"
+                      name="nombre"
                       placeholder="Nombre de la autoescuela"
-                      bind:value={nombreAutoescuela}
+                      bind:value={nombre}
                     />
                   </div>
                   <div class="mb-4">
@@ -206,9 +218,9 @@
                       type="tel"
                       class="form-control"
                       id="telefonoAutoescuela"
-                      name="telefonoAutoescuela"
+                      name="telefono"
                       placeholder="Teléfono"
-                      bind:value={telefonoAutoescuela}
+                      bind:value={telefono}
                     />
                   </div>
                   <div class="mb-4">
@@ -219,9 +231,9 @@
                       type="text"
                       class="form-control"
                       id="practicaAutoescuela"
-                      name="practicaAutoescuela"
+                      name="practica"
                       placeholder="Precio por clase práctica"
-                      bind:value={practicaAutoescuela}
+                      bind:value={practica}
                     />
                   </div>
                 </div>
@@ -235,7 +247,7 @@
                   />
                 </div>
                 <br />
-                <div class="d-flex justify-content-end">
+                <!-- <div class="d-flex justify-content-end">
                   <a
                     href="#"
                     class="boton-borrar"
@@ -243,7 +255,7 @@
                     data-bs-target="#modalBorrarAutoescuela"
                     >Borrar autoescuela</a
                   >
-                </div>
+                </div> -->
               </form>
             </div>
 
