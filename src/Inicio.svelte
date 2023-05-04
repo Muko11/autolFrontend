@@ -180,7 +180,9 @@
     <h2>Software para la gestión de autoescuelas. ¡Comienza ahora!</h2>
     <br />
     {#if isProfessor}
-      <a href="#oportunidades" class="boton btn-portada">Comenzar</a>
+      {#if !user.id_autoescuela}
+        <a href="#oportunidades" class="boton btn-portada">Comenzar</a>
+      {/if}
     {/if}
   </div>
 </div>

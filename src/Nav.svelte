@@ -4,6 +4,7 @@
 
   let isLogged;
   let isProfessor;
+  const user = JSON.parse(localStorage.getItem("user"));
 
   onMount(() => {
     // Verificar si hay un usuario en sesión al cargar la página
@@ -71,9 +72,13 @@
               <a class="nav-link" href="/#servicios">Servicios</a>
             </div>
             {#if isProfessor}
-              <div class="nav-item">
-                <a class="nav-link" href="/#oportunidades">Crear autoescuela</a>
-              </div>
+              {#if !user.id_autoescuela}
+                <div class="nav-item">
+                  <a class="nav-link" href="/#oportunidades"
+                    >Crear autoescuela</a
+                  >
+                </div>
+              {/if}
             {/if}
             <div class="nav-item">
               <a class="nav-link" href="/#contacto">Contacto</a>
@@ -101,11 +106,13 @@
                   <Link to="/account" class="dropdown-item">Mi cuenta</Link>
                 </li>
                 {#if isProfessor}
-                  <li>
-                    <Link to="/profesor" class="dropdown-item"
-                      >Soy profesor</Link
-                    >
-                  </li>
+                  {#if user.id_autoescuela}
+                    <li>
+                      <Link to="/profesor" class="dropdown-item"
+                        >Soy profesor</Link
+                      >
+                    </li>
+                  {/if}
                 {:else}
                   <li>
                     <Link to="/alumno" class="dropdown-item">Soy alumno</Link>

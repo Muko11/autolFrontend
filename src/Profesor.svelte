@@ -10,10 +10,11 @@
   let nombre = "";
   let telefono = "";
   let practica = "";
+  let profesores = [];
 
   onMount(async () => {
     try {
-      const response = await fetch(URL.autoescuela + id_usuario);
+      const response = await fetch(URL.autoescuela + "usuario/" + id_autoescuela);
       const autoescuela = await response.json();
       nombre = autoescuela.nombre;
       telefono = autoescuela.telefono;
@@ -60,41 +61,34 @@
     }
   }
 
-  let emailProfesor = "";
+  /* Añadir profesor a autoescuela */
 
-  /* async function handleSubmit(event) {
-    event.preventDefault(); // evita que el formulario se envíe automáticamente
+  async function agregarProfesor(event) {
+    event.preventDefault();
 
-    try {
-      // Consultar si el usuario es rol profesor
-      const response = await fetch(`${URL.usuarios}?correo=${emailProfesor}`);
-      const data = await response.json();
-      const usuario = data[0];
+    const correo = event.target.emailProfesor.value;
 
-      if (!usuario || usuario.rol !== "profesor") {
-        throw new Error(
-          "El correo ingresado no pertenece a un usuario con rol profesor"
-        );
+    const response = await fetch(
+      URL.profesor + "agregar/" + `${correo}` + "/" + id_autoescuela,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ correo }),
       }
+    );
 
-      // Insertar al profesor en la autoescuela correspondiente
-      const response2 = await fetch(
-        `${URL.profesor}${usuario.id_usuario}/${id_autoescuela}`,
-        {
-          method: "POST",
-        }
-      );
-      const data2 = await response2.json();
+    const data = await response.json();
 
-      console.log(data2);
-
-      // Mostrar mensaje de éxito
-      setSuccessMessage("Profesor agregado correctamente");
-    } catch (error) {
-      console.error(error.message);
-      setErrorMessage(error.message);
+    // Si la respuesta fue exitosa, agregar el id_autoescuela del profesor al localStorage
+    if (response.ok) {
+      const id_autoescuela_profesor = data.id_autoescuela;
+      localStorage.setItem("id_autoescuela", id_autoescuela_profesor);
     }
-  } */
+
+    console.log(data);
+  }
 </script>
 
 <!-- Nav lateral -->
@@ -175,7 +169,9 @@
             <!-- Aside - Código autoescuela -->
 
             <div class="tab-pane fade show active px-4" id="nav-autoescuela">
-              <div class="row row-cols-sm-2 row-cols-md-2 d-flex justify-content-between mb-4">
+              <div
+                class="row row-cols-sm-2 row-cols-md-2 d-flex justify-content-between mb-4"
+              >
                 <h4>Datos de la autoescuela</h4>
                 <div
                   class="toast align-items-center text-bg-success border-0"
@@ -184,7 +180,9 @@
                   aria-atomic="true"
                 >
                   <div class="d-flex">
-                    <div class="toast-body">Datos actualizados correctamente</div>
+                    <div class="toast-body">
+                      Datos actualizados correctamente
+                    </div>
                     <button
                       type="button"
                       class="btn-close btn-close-white me-2 m-auto"
@@ -266,7 +264,7 @@
 
               <!-- <a href="#" data-bs-toggle="modal" data-bs-target="#modalAñadirProfesor"><i class="fa-solid fa-user-plus fa-2x i-añadir"></i></a> -->
 
-              <form class="mb-5" on:submit={handleSubmit}>
+              <form class="mb-5" on:submit={agregarProfesor}>
                 <div class="row row-cols row-cols-md-2">
                   <div class="mb-4">
                     <label for="emailProfesor" class="fw-bold mb-2"
@@ -276,7 +274,7 @@
                       type="email"
                       class="form-control"
                       id="emailProfesor"
-                      bind:value={emailProfesor}
+                      name="emailProfesor"
                       placeholder="Correo del profesor"
                     />
                   </div>
