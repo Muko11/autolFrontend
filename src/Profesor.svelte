@@ -14,7 +14,9 @@
 
   onMount(async () => {
     try {
-      const response = await fetch(URL.autoescuela + "usuario/" + id_autoescuela);
+      const response = await fetch(
+        URL.autoescuela + "usuario/" + id_autoescuela
+      );
       const autoescuela = await response.json();
       nombre = autoescuela.nombre;
       telefono = autoescuela.telefono;
@@ -89,6 +91,18 @@
 
     console.log(data);
   }
+
+  /* Mostrar profesores */
+  async function obtenerProfesores() {
+    const response = await fetch(
+      URL.profesor + "autoescuela/" + id_autoescuela
+    );
+    const data = await response.json();
+    profesores = Object.values(data);
+    console.log(profesores)
+  }
+
+  onMount(obtenerProfesores);
 </script>
 
 <!-- Nav lateral -->
@@ -311,7 +325,18 @@
                       <th scope="col">Acciones</th>
                     </tr>
                   </thead>
-                  <tbody id="tablaProfesores" />
+                  <tbody id="tablaProfesores">
+                    {#each profesores as profesor, i}
+                      <tr>
+                        <td>{i + 1}</td>
+                        <td>{profesor.nombre} {profesor.apellidos}</td>
+                        <td>{profesor.correo}</td>
+                        <td>
+                          <!-- Acciones para el profesor -->
+                        </td>
+                      </tr>
+                    {/each}
+                  </tbody>
                 </table>
               </div>
             </div>
