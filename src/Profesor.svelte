@@ -11,6 +11,7 @@
   let telefono = "";
   let practica = "";
   let profesores = [];
+  let filtrarProfesores = "";
 
   onMount(async () => {
     try {
@@ -26,6 +27,7 @@
     }
   });
 
+  /* Actualizar datos autoescuela */
   async function handleSubmit(event) {
     event.preventDefault();
 
@@ -55,8 +57,13 @@
       practicaAutoescuela.value = newData.precio_practica;
 
       // Mostrar el toast
-      const toast = document.querySelector(".toast");
+      const toast = document.querySelector("#toastDatosAutoescuela");
       toast.classList.add("show");
+
+      // Ocultar el toast después de 7 segundos
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 7000);
     } else {
       // Manejar errores
       console.error("Ha ocurrido un error al actualizar la autoescuela");
@@ -87,6 +94,25 @@
     if (response.ok) {
       const id_autoescuela_profesor = data.id_autoescuela;
       localStorage.setItem("id_autoescuela", id_autoescuela_profesor);
+      obtenerProfesores();
+
+      // Mostrar el toast
+      const toast = document.querySelector("#toastAgregarProfesor");
+      toast.classList.add("show");
+
+      // Ocultar el toast después de 7 segundos
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 7000);
+    } else {
+      // Mostrar el toast
+      const toast = document.querySelector("#toastErrorAgregarProfesor");
+      toast.classList.add("show");
+
+      // Ocultar el toast después de 7 segundos
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 7000);
     }
 
     console.log(data);
@@ -99,10 +125,45 @@
     );
     const data = await response.json();
     profesores = Object.values(data);
-    console.log(profesores)
+    console.log(profesores);
   }
 
   onMount(obtenerProfesores);
+
+  /* Borrar un profesor */
+  async function borrarProfesor(id_profesor) {
+    const response = await fetch(URL.profesor + id_profesor, {
+      method: "DELETE",
+    });
+
+    if (response.ok) {
+      // Si se eliminó el profesor correctamente, volvemos a cargar la lista
+      obtenerProfesores();
+
+      // Mostrar el toast
+      const toast = document.querySelector("#toastBorrarProfesor");
+      toast.classList.add("show");
+
+      // Ocultar el toast después de 7 segundos
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 7000);
+    } else {
+      console.error("Error al eliminar el profesor");
+    }
+  }
+
+  /* Comprobar si el usuario es administrador */
+
+/*   let es_administrador = false;
+
+  onMount(async () => {
+    const res = await fetch(
+      URL.profesor + id_autoescuela + "/" + id_profesor + "/administrador"
+    );
+    const { es_administrador: esAdmin } = await res.json();
+    es_administrador = esAdmin;
+  }); */
 </script>
 
 <!-- Nav lateral -->
@@ -111,6 +172,129 @@
     <div class="col mt-5 mb-3">
       <div>
         <h3 class="text-uppercase text-center">Panel de control</h3>
+
+        <div class="toast-container position-static">
+          <!-- Toast Datos Autoescuela -->
+
+          <div
+            class="toast bg-success"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastDatosAutoescuela"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación exitosa!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              Se han actualizado con éxito los datos de la autoescuela
+            </div>
+          </div>
+
+          <!-- Toast Agregar profesor -->
+
+          <div
+            class="toast bg-success"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastAgregarProfesor"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación exitosa!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              Se ha añadido al profesor a la autoescuela correctamente
+            </div>
+          </div>
+
+          <!-- Toast Error Agregar profesor -->
+
+          <div
+            class="toast bg-danger"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastErrorAgregarProfesor"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación fallida!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              No se ha podido añadir al profesor porque ya está asignado a una
+              autoescuela, no es un profesor o no existe el correo
+            </div>
+          </div>
+
+          <!-- Toast Borrar profesor -->
+
+          <div
+            class="toast bg-success"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastBorrarProfesor"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación exitosa!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              Se ha borrado con éxito al profesor de la autoescuela
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -187,24 +371,6 @@
                 class="row row-cols-sm-2 row-cols-md-2 d-flex justify-content-between mb-4"
               >
                 <h4>Datos de la autoescuela</h4>
-                <div
-                  class="toast align-items-center text-bg-success border-0"
-                  role="alert"
-                  aria-live="assertive"
-                  aria-atomic="true"
-                >
-                  <div class="d-flex">
-                    <div class="toast-body">
-                      Datos actualizados correctamente
-                    </div>
-                    <button
-                      type="button"
-                      class="btn-close btn-close-white me-2 m-auto"
-                      data-bs-dismiss="toast"
-                      aria-label="Close"
-                    />
-                  </div>
-                </div>
               </div>
 
               <form class="mb-5" on:submit={handleSubmit}>
@@ -249,7 +415,6 @@
                     />
                   </div>
                 </div>
-
                 <div>
                   <input
                     class="boton"
@@ -303,17 +468,13 @@
                 </div>
               </form>
 
-              <form>
-                <div class="my-4">
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="buscadorProfesor"
-                    placeholder="Buscar profesores"
-                    value=""
-                  />
-                </div>
-              </form>
+              <input
+                type="text"
+                class="form-control my-4"
+                id="buscadorProfesor"
+                placeholder="Buscar profesores"
+                bind:value={filtrarProfesores}
+              />
 
               <div class="table-responsive-lg">
                 <table class="table text-center">
@@ -326,13 +487,33 @@
                     </tr>
                   </thead>
                   <tbody id="tablaProfesores">
-                    {#each profesores as profesor, i}
+                    {#each profesores
+                      .sort((a, b) => a.nombre.localeCompare(b.nombre) || a.apellidos.localeCompare(b.apellidos))
+                      .filter((profesor) => profesor.nombre
+                            .toLowerCase()
+                            .includes(filtrarProfesores.toLowerCase()) || profesor.apellidos
+                            .toLowerCase()
+                            .includes(filtrarProfesores.toLowerCase()) || profesor.correo
+                            .toLowerCase()
+                            .includes(filtrarProfesores.toLowerCase())) as profesor, i}
                       <tr>
-                        <td>{i + 1}</td>
+                        <td><b>{i + 1}</b></td>
                         <td>{profesor.nombre} {profesor.apellidos}</td>
                         <td>{profesor.correo}</td>
                         <td>
-                          <!-- Acciones para el profesor -->
+                          {#if profesor.id_profesor === id_usuario}
+                            <div style="display: flex; align-items: center">
+                              <i class="fa-solid fa-star fa-2x i-start" />
+                              <b class="ms-1">Administrador</b>
+                            </div>
+                          {:else}
+                            <i
+                              class="fa-solid fa-trash fa-2x i-trash"
+                              type="button"
+                              on:click={() =>
+                                borrarProfesor(profesor.id_profesor)}
+                            />
+                          {/if}
                         </td>
                       </tr>
                     {/each}
@@ -605,6 +786,10 @@
     vertical-align: middle;
   }
 
+  table tbody tr:hover {
+    background-color: aliceblue;
+  }
+
   /* Comunicados */
   .comunicados {
     border-left: 5px solid #5499c7;
@@ -618,6 +803,10 @@
 
   .i-trash {
     color: red;
+  }
+
+  .i-start {
+    color: gold;
   }
 
   .i-finalizado {
