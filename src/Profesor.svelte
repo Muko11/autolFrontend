@@ -155,7 +155,15 @@
 
   /* Comprobar si el usuario es administrador */
 
-/*   let es_administrador = false;
+  let es_administrador = false;
+
+  onMount(async () => {
+    const response = await fetch(URL.profesor + "admin/" + id_usuario);
+    const data = await response.json();
+    es_administrador = data.es_administrador;
+  });
+
+  /*   let es_administrador = false;
 
   onMount(async () => {
     const res = await fetch(
@@ -415,14 +423,16 @@
                     />
                   </div>
                 </div>
-                <div>
-                  <input
-                    class="boton"
-                    type="submit"
-                    name="actualizaDatos"
-                    value="Guardar cambios"
-                  />
-                </div>
+                {#if es_administrador}
+                  <div>
+                    <input
+                      class="boton"
+                      type="submit"
+                      name="actualizaDatos"
+                      value="Guardar cambios"
+                    />
+                  </div>
+                {/if}
                 <br />
                 <!-- <div class="d-flex justify-content-end">
                   <a
@@ -442,32 +452,32 @@
               <h4 class="mb-4">Profesores</h4>
 
               <!-- <a href="#" data-bs-toggle="modal" data-bs-target="#modalAñadirProfesor"><i class="fa-solid fa-user-plus fa-2x i-añadir"></i></a> -->
-
-              <form class="mb-5" on:submit={agregarProfesor}>
-                <div class="row row-cols row-cols-md-2">
-                  <div class="mb-4">
-                    <label for="emailProfesor" class="fw-bold mb-2"
-                      >Agregar profesor</label
-                    >
+              {#if es_administrador}
+                <form class="mb-5" on:submit={agregarProfesor}>
+                  <div class="row row-cols row-cols-md-2">
+                    <div class="mb-4">
+                      <label for="emailProfesor" class="fw-bold mb-2"
+                        >Agregar profesor</label
+                      >
+                      <input
+                        type="email"
+                        class="form-control"
+                        id="emailProfesor"
+                        name="emailProfesor"
+                        placeholder="Correo del profesor"
+                      />
+                    </div>
+                  </div>
+                  <div>
                     <input
-                      type="email"
-                      class="form-control"
-                      id="emailProfesor"
-                      name="emailProfesor"
-                      placeholder="Correo del profesor"
+                      class="boton"
+                      type="submit"
+                      name="botonAñadirProfesor"
+                      value="Agregar profesor"
                     />
                   </div>
-                </div>
-                <div>
-                  <input
-                    class="boton"
-                    type="submit"
-                    name="botonAñadirProfesor"
-                    value="Agregar profesor"
-                  />
-                </div>
-              </form>
-
+                </form>
+              {/if}
               <input
                 type="text"
                 class="form-control my-4"
@@ -483,7 +493,9 @@
                       <th scope="col">#</th>
                       <th scope="col">Profesor</th>
                       <th scope="col">Email</th>
-                      <th scope="col">Acciones</th>
+                      {#if es_administrador}
+                        <th scope="col">Acciones</th>
+                      {/if}
                     </tr>
                   </thead>
                   <tbody id="tablaProfesores">
@@ -500,21 +512,23 @@
                         <td><b>{i + 1}</b></td>
                         <td>{profesor.nombre} {profesor.apellidos}</td>
                         <td>{profesor.correo}</td>
-                        <td>
-                          {#if profesor.id_profesor === id_usuario}
-                            <div style="display: flex; align-items: center">
-                              <i class="fa-solid fa-star fa-2x i-start" />
-                              <b class="ms-1">Administrador</b>
-                            </div>
-                          {:else}
-                            <i
-                              class="fa-solid fa-trash fa-2x i-trash"
-                              type="button"
-                              on:click={() =>
-                                borrarProfesor(profesor.id_profesor)}
-                            />
-                          {/if}
-                        </td>
+                        {#if es_administrador}
+                          <td>
+                            {#if profesor.id_profesor === id_usuario}
+                              <div style="display: flex; align-items: center">
+                                <i class="fa-solid fa-star fa-2x i-start" />
+                                <b class="ms-1">Administrador</b>
+                              </div>
+                            {:else}
+                              <i
+                                class="fa-solid fa-trash fa-2x i-trash"
+                                type="button"
+                                on:click={() =>
+                                  borrarProfesor(profesor.id_profesor)}
+                              />
+                            {/if}
+                          </td>
+                        {/if}
                       </tr>
                     {/each}
                   </tbody>
