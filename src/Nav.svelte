@@ -4,6 +4,7 @@
 
   let isLogged;
   let isProfessor;
+  let isAlumno;
   const user = JSON.parse(localStorage.getItem("user"));
 
   onMount(() => {
@@ -113,7 +114,7 @@
                       >
                     </li>
                   {/if}
-                {:else}
+                {:else if user.id_autoescuela}
                   <li>
                     <Link to="/alumno" class="dropdown-item">Soy alumno</Link>
                   </li>

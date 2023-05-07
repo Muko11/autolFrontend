@@ -12,6 +12,7 @@
 		account: "http://localhost:3000/autol/account/",
 		autoescuela: "http://localhost:3000/autol/autoescuela/",
 		profesor: "http://localhost:3000/autol/profesor/",
+		alumno: "http://localhost:3000/autol/alumno/",
 	}; */
 
 	const URL = {
@@ -21,6 +22,7 @@
 		account: "https://autolbackend.onrender.com/autol/account/",
 		autoescuela: "https://autolbackend.onrender.com/autol/autoescuela/",
 		profesor: "https://autolbackend.onrender.com/autol/profesor/",
+		alumno: "https://autolbackend.onrender.com/autol/alumno/",
 	};
 
 	setContext("URL", URL);

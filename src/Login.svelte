@@ -125,16 +125,17 @@
 
       try {
         if (user.rol === "profesor") {
+          // Consulta a la tabla 'profesores'
           const profesorResponse = await fetch(URL.profesor + user.id_usuario, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
             },
           });
-
           const profesorData = await profesorResponse.json();
 
           if (profesorData.id_profesor) {
+            // Consulta a la tabla 'profesores_detalle'
             const profesorDetailResponse = await fetch(
               URL.profesor + profesorData.id_profesor,
               {
@@ -144,9 +145,35 @@
                 },
               }
             );
-
             const profesorDetailData = await profesorDetailResponse.json();
             const id_autoescuela = profesorDetailData.id_autoescuela;
+
+            user.id_autoescuela = id_autoescuela;
+          }
+        } else if (user.rol === "alumno") {
+          // Consulta a la tabla 'alumnos'
+          const alumnoResponse = await fetch(URL.alumno + user.id_usuario, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          const alumnoData = await alumnoResponse.json();
+
+          if (alumnoData.id_alumno) {
+            // Consulta a la tabla 'autoescuelas_alumnos'
+            const autoescuelaAlumnoResponse = await fetch(
+              URL.alumno + alumnoData.id_alumno,
+              {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+            const autoescuelaAlumnoData =
+              await autoescuelaAlumnoResponse.json();
+            const id_autoescuela = autoescuelaAlumnoData.id_autoescuela;
 
             user.id_autoescuela = id_autoescuela;
           }

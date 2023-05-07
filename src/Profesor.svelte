@@ -11,7 +11,9 @@
   let telefono = "";
   let practica = "";
   let profesores = [];
+  let alumnos = [];
   let filtrarProfesores = "";
+  let filtrarAlumnos = "";
 
   onMount(async () => {
     try {
@@ -88,10 +90,11 @@
       }
     );
 
-    const data = await response.json();
+    let data = {};
 
     // Si la respuesta fue exitosa, agregar el id_autoescuela del profesor al localStorage
     if (response.ok) {
+      data = await response.json();
       const id_autoescuela_profesor = data.id_autoescuela;
       localStorage.setItem("id_autoescuela", id_autoescuela_profesor);
       obtenerProfesores();
@@ -163,15 +166,88 @@
     es_administrador = data.es_administrador;
   });
 
-  /*   let es_administrador = false;
+  /* Añadir alumno a autoescuela */
 
-  onMount(async () => {
-    const res = await fetch(
-      URL.profesor + id_autoescuela + "/" + id_profesor + "/administrador"
+  async function agregarAlumno(event) {
+    event.preventDefault();
+
+    const correo = event.target.emailAlumno.value;
+    console.log("Id auto desde alumno: " + id_autoescuela);
+    const response = await fetch(
+      URL.alumno + "agregar/" + `${correo}` + "/" + id_autoescuela,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ correo }),
+      }
     );
-    const { es_administrador: esAdmin } = await res.json();
-    es_administrador = esAdmin;
-  }); */
+
+    //const data = await response.json();
+    let data = {};
+
+    // Si la respuesta fue exitosa, agregar el id_autoescuela del alumno al localStorage
+    if (response.ok) {
+      data = await response.json();
+      const id_autoescuela_alumno = data.id_autoescuela;
+      localStorage.setItem("id_autoescuela", id_autoescuela_alumno);
+      obtenerAlumnos();
+
+      // Mostrar el toast
+      const toast = document.querySelector("#toastAgregarAlumno");
+      toast.classList.add("show");
+
+      // Ocultar el toast después de 7 segundos
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 7000);
+    } else {
+      // Mostrar el toast
+      const toast = document.querySelector("#toastErrorAgregarAlumno");
+      toast.classList.add("show");
+
+      // Ocultar el toast después de 7 segundos
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 7000);
+    }
+
+    console.log(data);
+  }
+
+  /* Mostrar alumnos */
+  async function obtenerAlumnos() {
+    const response = await fetch(URL.alumno + "autoescuela/" + id_autoescuela);
+    const data = await response.json();
+    alumnos = Object.values(data);
+    console.log(alumnos);
+  }
+
+  onMount(obtenerAlumnos);
+
+  /* Borrar un alumno */
+  async function borrarAlumno(id_alumno) {
+    const response = await fetch(URL.alumno + id_alumno, {
+      method: "DELETE",
+    });
+
+    if (response.ok) {
+      // Si se eliminó el alumno correctamente, volvemos a cargar la lista
+      obtenerAlumnos();
+
+      // Mostrar el toast
+      const toast = document.querySelector("#toastBorrarAlumno");
+      toast.classList.add("show");
+
+      // Ocultar el toast después de 7 segundos
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 7000);
+    } else {
+      console.error("Error al eliminar el alumno");
+    }
+  }
 </script>
 
 <!-- Nav lateral -->
@@ -300,6 +376,97 @@
             </div>
             <div class="toast-body text-white">
               Se ha borrado con éxito al profesor de la autoescuela
+            </div>
+          </div>
+
+          <!-- Toast Agregar alumno -->
+
+          <div
+            class="toast bg-success"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastAgregarAlumno"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación exitosa!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              Se ha añadido al alumno a la autoescuela correctamente
+            </div>
+          </div>
+
+          <!-- Toast Error Agregar alumno -->
+
+          <div
+            class="toast bg-danger"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastErrorAgregarAlumno"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación fallida!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              No se ha podido añadir al alumno porque ya está asignado a una
+              autoescuela, no es un alumno o no existe el correo
+            </div>
+          </div>
+
+          <!-- Toast Borrar alumno -->
+
+          <div
+            class="toast bg-success"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastBorrarAlumno"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación exitosa!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              Se ha borrado con éxito al alumno de la autoescuela
             </div>
           </div>
         </div>
@@ -542,35 +709,32 @@
               <h4 class="mb-4">Alumnos</h4>
 
               <!-- <a href="#" data-bs-toggle="modal" data-bs-target="#modalAñadirAlumno"><i class="fa-solid fa-user-plus fa-2x i-añadir"></i></a> -->
-
-              <form
-                class="mb-5"
-                method="POST"
-                action="forms/procesarAlumno.php"
-              >
-                <div class="row row-cols row-cols-md-2">
-                  <div class="mb-4">
-                    <label for="emailAlumno" class="fw-bold mb-2"
-                      >Agregar alumno</label
-                    >
+              {#if es_administrador}
+                <form class="mb-5" on:submit={agregarAlumno}>
+                  <div class="row row-cols row-cols-md-2">
+                    <div class="mb-4">
+                      <label for="emailAlumno" class="fw-bold mb-2"
+                        >Agregar alumno</label
+                      >
+                      <input
+                        type="email"
+                        class="form-control"
+                        id="emailAlumno"
+                        name="emailAlumno"
+                        placeholder="Correo del alumno"
+                      />
+                    </div>
+                  </div>
+                  <div>
                     <input
-                      type="email"
-                      class="form-control"
-                      id="emailAlumno"
-                      name="emailAlumno"
-                      placeholder="Correo del alumno"
+                      class="boton"
+                      type="submit"
+                      name="botonAñadirAlumno"
+                      value="Agregar alumno"
                     />
                   </div>
-                </div>
-                <div>
-                  <input
-                    class="boton"
-                    type="submit"
-                    name="botonAñadirAlumno"
-                    value="Agregar alumno"
-                  />
-                </div>
-              </form>
+                </form>
+              {/if}
 
               <form>
                 <div class="my-4">
@@ -579,7 +743,7 @@
                     class="form-control"
                     id="buscadorAlumno"
                     placeholder="Buscar alumnos"
-                    value=""
+                    bind:value={filtrarAlumnos}
                   />
                 </div>
               </form>
@@ -591,10 +755,37 @@
                       <th scope="col">#</th>
                       <th scope="col">Alumno</th>
                       <th scope="col">Email</th>
-                      <th scope="col">Acciones</th>
+                      {#if es_administrador}
+                        <th scope="col">Acciones</th>
+                      {/if}
                     </tr>
                   </thead>
-                  <tbody id="tablaAlumnos" />
+                  <tbody id="tablaAlumnos">
+                    {#each alumnos
+                      .sort((a, b) => a.nombre.localeCompare(b.nombre) || a.apellidos.localeCompare(b.apellidos))
+                      .filter((alumno) => alumno.nombre
+                            .toLowerCase()
+                            .includes(filtrarAlumnos.toLowerCase()) || alumno.apellidos
+                            .toLowerCase()
+                            .includes(filtrarAlumnos.toLowerCase()) || alumno.correo
+                            .toLowerCase()
+                            .includes(filtrarAlumnos.toLowerCase())) as alumno, i}
+                      <tr>
+                        <td><b>{i + 1}</b></td>
+                        <td>{alumno.nombre} {alumno.apellidos}</td>
+                        <td>{alumno.correo}</td>
+                        {#if es_administrador}
+                          <td>
+                            <i
+                              class="fa-solid fa-trash fa-2x i-trash"
+                              type="button"
+                              on:click={() => borrarAlumno(alumno.id_alumno)}
+                            />
+                          </td>
+                        {/if}
+                      </tr>
+                    {/each}
+                  </tbody>
                 </table>
               </div>
             </div>
