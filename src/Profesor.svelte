@@ -1,6 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { getContext } from "svelte";
+  import { format } from 'date-fns';
 
   const URL = getContext("URL");
   const user = JSON.parse(localStorage.getItem("user"));
@@ -12,8 +13,10 @@
   let practica = "";
   let profesores = [];
   let alumnos = [];
+  let practicas = [];
   let filtrarProfesores = "";
   let filtrarAlumnos = "";
+  let filtrarPracticas = "";
 
   onMount(async () => {
     try {
@@ -248,6 +251,97 @@
       console.error("Error al eliminar el alumno");
     }
   }
+
+  /* Crear una practica */
+
+  async function crearPractica(event) {
+    event.preventDefault(); // Evitar que se envíe el formulario
+
+    const form = event.target; // Obtener el formulario actual
+
+    // Obtener los valores de los campos de entrada
+    const fecha = form.fecha.value;
+    const hora = form.hora.value;
+    const tipo = form.tipo.value;
+
+    try {
+      const response = await fetch(URL.practica + id_usuario, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id_usuario,
+          fecha,
+          hora,
+          tipo,
+        }),
+      });
+
+      let data = {};
+      if (response.ok) {
+        data = await response.json();
+
+        obtenerPracticas();
+        // Mostrar el toast
+        const toast = document.querySelector("#toastAgregarPractica");
+        toast.classList.add("show");
+
+        // Ocultar el toast después de 7 segundos
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 7000);
+      } else {
+        // Mostrar el toast
+        const toast = document.querySelector("#toastErrorAgregarPractica");
+        toast.classList.add("show");
+
+        // Ocultar el toast después de 7 segundos
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 7000);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  /* Mostar practicas */
+
+  async function obtenerPracticas() {
+    const response = await fetch(URL.practica + id_usuario);
+    const data = await response.json();
+    practicas = Object.values(data);
+    console.log(practicas);
+  }
+
+  /* Borrar una practica */
+  async function borrarPractica(id_practica, fecha, hora) {
+    const response = await fetch(
+      URL.practica + id_practica + "/" + fecha + "/" + hora,
+      {
+        method: "DELETE",
+      }
+    );
+
+    if (response.ok) {
+      // Si se eliminó la practica correctamente, volvemos a cargar la lista
+      obtenerPracticas();
+
+      // Mostrar el toast
+      const toast = document.querySelector("#toastBorrarPractica");
+      toast.classList.add("show");
+
+      // Ocultar el toast después de 7 segundos
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 7000);
+    } else {
+      console.error("Error al eliminar la práctica");
+    }
+  }
+
+  onMount(obtenerPracticas);
 </script>
 
 <!-- Nav lateral -->
@@ -467,6 +561,97 @@
             </div>
             <div class="toast-body text-white">
               Se ha borrado con éxito al alumno de la autoescuela
+            </div>
+          </div>
+
+          <!-- Toast Agregar practica -->
+
+          <div
+            class="toast bg-success"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastAgregarPractica"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación exitosa!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              Se ha creado la práctica correctamente
+            </div>
+          </div>
+
+          <!-- Toast Error Agregar practica -->
+
+          <div
+            class="toast bg-danger"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastErrorAgregarPractica"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación fallida!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              No se ha podido crear la práctica porque faltan datos o ya existe
+              una práctica con esa fecha y hora
+            </div>
+          </div>
+
+          <!-- Toast Borrar practica -->
+
+          <div
+            class="toast bg-success"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastBorrarPractica"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación exitosa!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              Se ha borrado con éxito la práctica
             </div>
           </div>
         </div>
@@ -795,11 +980,7 @@
             <div class="tab-pane fade show px-4" id="nav-practica">
               <h4 class="mb-4">Crear una práctica</h4>
 
-              <form
-                class="mb-5"
-                method="POST"
-                action="forms/procesarPractica.php"
-              >
+              <form class="mb-5" on:submit={crearPractica}>
                 <div class="row row-cols-1 row-cols-md-1 row-cols-lg-3">
                   <div class="mb-4">
                     <label for="fechaPractica" class="fw-bold mb-2">Fecha</label
@@ -854,6 +1035,14 @@
                 </div>
               </form>
 
+              <input
+                type="text"
+                class="form-control my-4"
+                id="buscadorPracticas"
+                placeholder="Buscar prácticas"
+                bind:value={filtrarPracticas}
+              />
+
               <h4 class="mb-4">Tabla de prácticas</h4>
 
               <div class="table-responsive-lg">
@@ -868,7 +1057,49 @@
                       <th scope="col">Acciones</th>
                     </tr>
                   </thead>
-                  <tbody />
+                  <tbody id="tablaPracticas">
+                    {#each practicas
+                      .sort((a, b) => a.fecha.localeCompare(b.fecha) || a.hora.localeCompare(b.hora))
+                      .filter((practica) => {
+                        const filtro = filtrarPracticas.toLowerCase();
+                        return practica.tipo
+                            .toLowerCase()
+                            .includes(filtro) || practica.hora
+                            .toLowerCase()
+                            .includes(filtro) || practica.fecha
+                            .toLowerCase()
+                            .includes(filtro) || (practica.alumno && practica.alumno
+                              .toLowerCase()
+                              .includes(filtro));
+                      }) as practica, i}
+                      <tr>
+                        <td><b>{i + 1}</b></td>
+                        <td>{format(new Date(practica.fecha), 'dd/MM/yyyy')}</td>
+                        <td>{practica.hora.slice(0, 5)}</td>
+                        <td>{practica.tipo.toUpperCase()}</td>
+                        <td style="color: {practica.alumno ? 'inherit' : 'red'}"
+                          >{practica.alumno || "Sin reservar"}</td
+                        >
+                        <td>
+                          <i
+                            class="fa-solid fa-pen-to-square fa-2x i-edit"
+                            type="button"
+                          />
+
+                          <i
+                            class="fa-solid fa-trash fa-2x i-trash"
+                            type="button"
+                            on:click={() =>
+                              borrarPractica(
+                                practica.id_profesor,
+                                practica.fecha,
+                                practica.hora
+                              )}
+                          />
+                        </td>
+                      </tr>
+                    {/each}
+                  </tbody>
                 </table>
               </div>
             </div>
