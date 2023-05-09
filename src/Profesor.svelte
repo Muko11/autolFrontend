@@ -925,75 +925,6 @@
               </div>
             </div>
 
-            <!-- Modal -->
-            <div
-              class="modal fade"
-              id="myModal"
-              tabindex="-1"
-              role="dialog"
-              aria-labelledby="myModalLabel"
-            >
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h4 class="modal-title">Editar Practica</h4>
-                  </div>
-                  <div class="modal-body">
-                    <form>
-                      <div class="form-group">
-                        <label for="nuevaFecha">Nueva Fecha:</label>
-                        <input
-                          type="date"
-                          class="form-control"
-                          id="nuevaFecha"
-                        />
-                      </div>
-                      <div class="form-group">
-                        <label for="nuevaHora">Nueva Hora:</label>
-                        <input
-                          type="time"
-                          class="form-control"
-                          id="nuevaHora"
-                        />
-                      </div>
-                      <div class="form-group">
-                        <label for="nuevoTipo">Nuevo Tipo:</label>
-                        <select id="nuevoTipo" class="form-control">
-                          <option value="am">AM</option>
-                          <option value="a1">A1</option>
-                          <option value="a2">A2</option>
-                          <option value="a">A</option>
-                          <option value="b1">B1</option>
-                          <option value="b">B</option>
-                          <option value="c1">C1</option>
-                          <option value="c">C</option>
-                          <option value="d1">D1</option>
-                          <option value="d">D</option>
-                          <option value="be">BE</option>
-                          <option value="c1e">C1E</option>
-                          <option value="ce">CE</option>
-                          <option value="d1e">D1E</option>
-                          <option value="de">DE</option>
-                        </select>
-                      </div>
-                    </form>
-                  </div>
-                  <div class="modal-footer">
-                    <button
-                      type="button"
-                      class="btn btn-secondary"
-                      data-dismiss="modal">Cerrar</button
-                    >
-                    <button
-                      type="button"
-                      class="btn btn-primary"
-                      onclick="actualizarPractica()">Guardar cambios</button
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-
             <!-- Aside - Alumno -->
 
             <div class="tab-pane fade show px-4" id="nav-alumno">
@@ -1135,7 +1066,7 @@
                       class="boton"
                       type="submit"
                       name="crearPractica"
-                      value="Crear práctica"
+                      value="Guardar"
                     />
                   </div>
                 </div>

@@ -164,64 +164,6 @@
             <div class="tab-pane fade show px-4" id="nav-practica">
               <h4 class="mb-4">Reservar práctica</h4>
 
-              <form class="mb-5">
-                <div class="row row-cols-1 row-cols-md-1 row-cols-lg-3">
-                  <div class="mb-4">
-                    <label for="fechaPractica" class="fw-bold mb-2"
-                      >Filtrar por fecha</label
-                    >
-                    <input
-                      type="date"
-                      class="form-control"
-                      id="fechaPractica"
-                    />
-                  </div>
-                  <div class="mb-4">
-                    <label for="profesorPractica" class="fw-bold mb-2"
-                      >Filtrar por profesor</label
-                    >
-                    <select id="profesorPractica" class="form-control">
-                      <option value="" selected="selected"
-                        >Selecciona un profesor</option
-                      >
-                      <option value="">Oterino</option>
-                      <option value="">Rafa</option>
-                      <option value="">Ester</option>
-                    </select>
-                  </div>
-                  <div class="mb-4">
-                    <label for="tipoPractica" class="fw-bold mb-2"
-                      >Filtrar por tipo de práctica</label
-                    >
-                    <select class="form-control" id="tipoPractica">
-                      <option value="">Selecciona un tipo de práctica</option>
-                      <option value="">AM</option>
-                      <option value="">A1</option>
-                      <option value="">A2</option>
-                      <option value="">A</option>
-                      <option value="">B1</option>
-                      <option value="">B</option>
-                      <option value="">C1</option>
-                      <option value="">C</option>
-                      <option value="">D1</option>
-                      <option value="">D</option>
-                      <option value="">BE</option>
-                      <option value="">C1E</option>
-                      <option value="">CE</option>
-                      <option value="">D1E</option>
-                      <option value="">DE</option>
-                    </select>
-                  </div>
-                  <div>
-                    <input
-                      class="boton"
-                      type="submit"
-                      value="Buscar prácticas"
-                    />
-                  </div>
-                </div>
-              </form>
-
               <div class="table-responsive-lg">
                 <table class="table text-center">
                   <thead>
