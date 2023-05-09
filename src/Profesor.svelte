@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { getContext } from "svelte";
-  import { format } from 'date-fns';
+  import { format } from "date-fns";
 
   const URL = getContext("URL");
   const user = JSON.parse(localStorage.getItem("user"));
@@ -342,6 +342,8 @@
   }
 
   onMount(obtenerPracticas);
+
+  /* Actualizar una practica */
 </script>
 
 <!-- Nav lateral -->
@@ -1074,9 +1076,41 @@
                       }) as practica, i}
                       <tr>
                         <td><b>{i + 1}</b></td>
-                        <td>{format(new Date(practica.fecha), 'dd/MM/yyyy')}</td>
-                        <td>{practica.hora.slice(0, 5)}</td>
-                        <td>{practica.tipo.toUpperCase()}</td>
+                        <td>
+                          <input
+                            type="date"
+                            value={format(
+                              new Date(practica.fecha),
+                              "yyyy-MM-dd"
+                            )}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="time"
+                            value={practica.hora.slice(0, 5)}
+                          />
+                        </td>
+                        <td>
+                          <select value={practica.tipo}>
+                            <option value="am">AM</option>
+                            <option value="a1">A1</option>
+                            <option value="a2">A2</option>
+                            <option value="a">A</option>
+                            <option value="b1">B1</option>
+                            <option value="b">B</option>
+                            <option value="c1">C1</option>
+                            <option value="c">C</option>
+                            <option value="d1">D1</option>
+                            <option value="d">D</option>
+                            <option value="be">BE</option>
+                            <option value="c1e">C1E</option>
+                            <option value="ce">CE</option>
+                            <option value="d1e">D1E</option>
+                            <option value="de">DE</option>
+                          </select>
+                        </td>
+
                         <td style="color: {practica.alumno ? 'inherit' : 'red'}"
                           >{practica.alumno || "Sin reservar"}</td
                         >
@@ -1084,6 +1118,12 @@
                           <i
                             class="fa-solid fa-pen-to-square fa-2x i-edit"
                             type="button"
+                            on:click={() =>
+                              actualizarPractica(
+                                practica.id_profesor,
+                                practica.fecha,
+                                practica.hora
+                              )}
                           />
 
                           <i
