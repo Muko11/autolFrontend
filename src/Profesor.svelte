@@ -344,6 +344,41 @@
   onMount(obtenerPracticas);
 
   /* Actualizar una practica */
+
+  async function actualizarPractica(
+    id_profesor,
+    fecha,
+    hora,
+    tipo,
+    nuevaFecha,
+    nuevaHora,
+    nuevotipo
+  ) {
+    try {
+      const res = await fetch(
+        URL.practica + id_profesor + "/" + fecha + "/" + hora + "/" + tipo,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nuevaFecha: nuevaFecha,
+            nuevaHora: nuevaHora,
+            nuevotipo: nuevotipo,
+          }),
+        }
+      );
+
+      if (res.status === 200) {
+        console.log("Práctica actualizada correctamente");
+      } else {
+        console.error("Error al actualizar la práctica");
+      }
+    } catch (err) {
+      console.error(err.message);
+    }
+  }
 </script>
 
 <!-- Nav lateral -->
@@ -890,6 +925,75 @@
               </div>
             </div>
 
+            <!-- Modal -->
+            <div
+              class="modal fade"
+              id="myModal"
+              tabindex="-1"
+              role="dialog"
+              aria-labelledby="myModalLabel"
+            >
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h4 class="modal-title">Editar Practica</h4>
+                  </div>
+                  <div class="modal-body">
+                    <form>
+                      <div class="form-group">
+                        <label for="nuevaFecha">Nueva Fecha:</label>
+                        <input
+                          type="date"
+                          class="form-control"
+                          id="nuevaFecha"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="nuevaHora">Nueva Hora:</label>
+                        <input
+                          type="time"
+                          class="form-control"
+                          id="nuevaHora"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="nuevoTipo">Nuevo Tipo:</label>
+                        <select id="nuevoTipo" class="form-control">
+                          <option value="am">AM</option>
+                          <option value="a1">A1</option>
+                          <option value="a2">A2</option>
+                          <option value="a">A</option>
+                          <option value="b1">B1</option>
+                          <option value="b">B</option>
+                          <option value="c1">C1</option>
+                          <option value="c">C</option>
+                          <option value="d1">D1</option>
+                          <option value="d">D</option>
+                          <option value="be">BE</option>
+                          <option value="c1e">C1E</option>
+                          <option value="ce">CE</option>
+                          <option value="d1e">D1E</option>
+                          <option value="de">DE</option>
+                        </select>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-dismiss="modal">Cerrar</button
+                    >
+                    <button
+                      type="button"
+                      class="btn btn-primary"
+                      onclick="actualizarPractica()">Guardar cambios</button
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Aside - Alumno -->
 
             <div class="tab-pane fade show px-4" id="nav-alumno">
@@ -1076,9 +1180,33 @@
                       }) as practica, i}
                       <tr>
                         <td><b>{i + 1}</b></td>
+
+                        <!-- <input
+                          type="hidden"
+                          id="antiguaFecha"
+                          value={format(
+                            new Date(practica.fecha),
+                            "yyyy-MM-dd"
+                          )}
+                        />
+
+                        <input
+                          type="hidden"
+                          id="antiguaHora"
+                          value={practica.hora}
+                        />
+
+                        <input
+                          type="hidden"
+                          id="antiguoTipo"
+                          value={practica.tipo}
+                        /> -->
+
                         <td>
                           <input
                             type="date"
+                            class="form-control"
+                            id="nuevaFecha"
                             value={format(
                               new Date(practica.fecha),
                               "yyyy-MM-dd"
@@ -1088,11 +1216,17 @@
                         <td>
                           <input
                             type="time"
+                            class="form-control"
+                            id="nuevaHora"
                             value={practica.hora.slice(0, 5)}
                           />
                         </td>
                         <td>
-                          <select value={practica.tipo}>
+                          <select
+                            id="nuevoTipo"
+                            class="form-control-sm"
+                            value={practica.tipo}
+                          >
                             <option value="am">AM</option>
                             <option value="a1">A1</option>
                             <option value="a2">A2</option>
@@ -1118,12 +1252,6 @@
                           <i
                             class="fa-solid fa-pen-to-square fa-2x i-edit"
                             type="button"
-                            on:click={() =>
-                              actualizarPractica(
-                                practica.id_profesor,
-                                practica.fecha,
-                                practica.hora
-                              )}
                           />
 
                           <i
