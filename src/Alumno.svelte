@@ -82,6 +82,23 @@
     await obtenerHistorial();
   });
 
+
+/* Cancelar practica */
+async function cancelarPractica(id_profesor, fecha, hora) {
+  try {
+    const response = await fetch(URL.practica + "cancelar/" + id_profesor + "/" + fecha + "/" + hora + "/" + id_usuario, {
+      method: 'PUT',
+    });
+    const data = await response.json();
+    console.log(data);
+    obtenerHistorial();
+    obtenerPracticas();
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
 </script>
 
 <!-- Nav lateral -->
@@ -274,6 +291,7 @@
                         <td>
                           <i
                             class="fa-regular fa-hand fa-2x i-reserva"
+                            type="button"
                             on:click={() =>
                               actualizarPractica(
                                 practica.id_profesor,
@@ -308,18 +326,32 @@
                   </thead>
                   <tbody>
                     {#each historial as practica, i}
-                    <tr>
-                      <td>{i + 1}</td>
-                      <td>{practica.fecha}</td>
-                      <td>{practica.hora}</td>
-                      <td>{practica.tipo}</td>
-                      <td>{practica.profesor.data.nombre} {practica.profesor.data.apellidos}</td>
-                      <td><button class="btn btn-danger">Cancelar</button></td>
-                    </tr>
+                      <tr>
+                        <td>{i + 1}</td>
+                        <td>{format(new Date(practica.fecha), "dd-MM-yyyy")}</td
+                        >
+                        <td>{practica.hora.slice(0, 5)}</td>
+                        <td>{practica.tipo.toUpperCase()}</td>
+                        <td
+                          >{practica.profesor.data.nombre}
+                          {practica.profesor.data.apellidos}</td
+                        >
+                        <td>
+                          <i
+                            class="fa-solid fa-trash fa-2x i-trash"
+                            type="button"
+                            on:click={() =>
+                              cancelarPractica(
+                                practica.id_profesor,
+                                practica.fecha,
+                                practica.hora
+                              )}
+                          /></td
+                        >
+                      </tr>
                     {/each}
                   </tbody>
                 </table>
-                
               </div>
 
               <h4 class="mb-4">Calcular precio de prácticas realizadas</h4>
