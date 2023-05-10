@@ -1,6 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { getContext } from "svelte";
+  import { format } from "date-fns";
 
   const URL = getContext("URL");
   const user = JSON.parse(localStorage.getItem("user"));
@@ -10,6 +11,9 @@
   let nombre = "";
   let telefono = "";
   let practica = "";
+  let practicas = [];
+  let historial = [];
+  let filtrarPracticas = "";
 
   async function datosAutoescuela() {
     const response = await fetch(URL.autoescuela + id_autoescuela);
@@ -22,6 +26,62 @@
   onMount(async () => {
     await datosAutoescuela();
   });
+
+  /* Mostrar practicas */
+  async function obtenerPracticas() {
+    const response = await fetch(URL.practica + "alumnos/" + id_autoescuela);
+    const data = await response.json();
+    practicas = Object.values(data);
+    console.log(practicas);
+  }
+
+  /* Actualizar null de id_alumno */
+
+  const actualizarPractica = async (id_profesor, fecha, hora, id_alumno) => {
+    try {
+      const response = await fetch(
+        URL.practica +
+          "alumno/" +
+          id_profesor +
+          "/" +
+          fecha +
+          "/" +
+          hora +
+          "/" +
+          id_alumno,
+        {
+          method: "PUT",
+        }
+      );
+      const data = await response.json();
+      console.log(data.message);
+      if (response.ok) {
+        obtenerPracticas();
+        obtenerHistorial();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  onMount(obtenerPracticas);
+
+  /* Mostrar historial */
+  async function obtenerHistorial() {
+    try {
+      const response = await fetch(URL.practica + "historial/" + id_usuario);
+      const data = await response.json();
+      historial = Object.values(data);
+      console.log(historial);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  onMount(async () => {
+    await obtenerHistorial();
+  });
+
 </script>
 
 <!-- Nav lateral -->
@@ -164,6 +224,14 @@
             <div class="tab-pane fade show px-4" id="nav-practica">
               <h4 class="mb-4">Reservar práctica</h4>
 
+              <input
+                type="text"
+                class="form-control my-4"
+                id="buscadorPracticas"
+                placeholder="Buscar prácticas"
+                bind:value={filtrarPracticas}
+              />
+
               <div class="table-responsive-lg">
                 <table class="table text-center">
                   <thead>
@@ -176,7 +244,48 @@
                       <th scope="col">Reservar</th>
                     </tr>
                   </thead>
-                  <tbody />
+                  <tbody id="tablaPracticas">
+                    {#each practicas
+                      .sort((a, b) => a.fecha.localeCompare(b.fecha) || a.hora.localeCompare(b.hora))
+                      .filter((practica) => {
+                        const filtro = filtrarPracticas.toLowerCase();
+                        return (practica.tipo
+                            .toLowerCase()
+                            .includes(filtro) || practica.hora
+                              .toLowerCase()
+                              .includes(filtro) || practica.fecha
+                              .toLowerCase()
+                              .includes(filtro) || practica.profesor.nombre
+                              .toLowerCase()
+                              .includes(filtro) || practica.profesor.apellidos
+                              .toLowerCase()
+                              .includes(filtro)) && practica.id_alumno === null;
+                      }) as practica, i}
+                      <tr>
+                        <td>{i + 1}</td>
+                        <td>{format(new Date(practica.fecha), "dd-MM-yyyy")}</td
+                        >
+                        <td>{practica.hora.slice(0, 5)}</td>
+                        <td>{practica.tipo.toUpperCase()}</td>
+                        <td
+                          >{practica.profesor.nombre}
+                          {practica.profesor.apellidos}</td
+                        >
+                        <td>
+                          <i
+                            class="fa-regular fa-hand fa-2x i-reserva"
+                            on:click={() =>
+                              actualizarPractica(
+                                practica.id_profesor,
+                                practica.fecha,
+                                practica.hora,
+                                id_usuario
+                              )}
+                          />
+                        </td>
+                      </tr>
+                    {/each}
+                  </tbody>
                 </table>
               </div>
             </div>
@@ -194,11 +303,23 @@
                       <th scope="col">Hora</th>
                       <th scope="col">Tipo</th>
                       <th scope="col">Profesor</th>
-                      <th scope="col">Cancelar</th>
+                      <th scope="col">Acciones</th>
                     </tr>
                   </thead>
-                  <tbody />
+                  <tbody>
+                    {#each historial as practica, i}
+                    <tr>
+                      <td>{i + 1}</td>
+                      <td>{practica.fecha}</td>
+                      <td>{practica.hora}</td>
+                      <td>{practica.tipo}</td>
+                      <td>{practica.profesor.data.nombre} {practica.profesor.data.apellidos}</td>
+                      <td><button class="btn btn-danger">Cancelar</button></td>
+                    </tr>
+                    {/each}
+                  </tbody>
                 </table>
+                
               </div>
 
               <h4 class="mb-4">Calcular precio de prácticas realizadas</h4>

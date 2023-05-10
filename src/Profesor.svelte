@@ -238,6 +238,7 @@
     if (response.ok) {
       // Si se eliminó el alumno correctamente, volvemos a cargar la lista
       obtenerAlumnos();
+      obtenerPracticas();
 
       // Mostrar el toast
       const toast = document.querySelector("#toastBorrarAlumno");
@@ -1177,7 +1178,7 @@
                         </td>
 
                         <td style="color: {practica.alumno ? 'inherit' : 'red'}"
-                          >{practica.alumno || "Sin reservar"}</td
+                          >{practica.id_alumno || "Sin reservar"}</td
                         >
                         <td>
                           <i
