@@ -58,9 +58,27 @@
       if (response.ok) {
         obtenerPracticas();
         obtenerHistorial();
+
+        // Mostrar el toast
+        const toast = document.querySelector("#toastReservarPractica");
+        toast.classList.add("show");
+
+        // Ocultar el toast después de 7 segundos
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 7000);
       }
     } catch (error) {
       console.log(error);
+
+      // Mostrar el toast
+      const toast = document.querySelector("#toastErrorReservarPractica");
+      toast.classList.add("show");
+
+      // Ocultar el toast después de 7 segundos
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 7000);
     }
   };
 
@@ -82,23 +100,49 @@
     await obtenerHistorial();
   });
 
+  /* Cancelar practica */
+  async function cancelarPractica(id_profesor, fecha, hora) {
+    try {
+      const response = await fetch(
+        URL.practica +
+          "cancelar/" +
+          id_profesor +
+          "/" +
+          fecha +
+          "/" +
+          hora +
+          "/" +
+          id_usuario,
+        {
+          method: "PUT",
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      obtenerHistorial();
+      obtenerPracticas();
 
-/* Cancelar practica */
-async function cancelarPractica(id_profesor, fecha, hora) {
-  try {
-    const response = await fetch(URL.practica + "cancelar/" + id_profesor + "/" + fecha + "/" + hora + "/" + id_usuario, {
-      method: 'PUT',
-    });
-    const data = await response.json();
-    console.log(data);
-    obtenerHistorial();
-    obtenerPracticas();
-  } catch (error) {
-    console.log(error);
+      // Mostrar el toast
+      const toast = document.querySelector("#toastCancelarPractica");
+      toast.classList.add("show");
+
+      // Ocultar el toast después de 7 segundos
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 7000);
+    } catch (error) {
+      console.log(error);
+
+      // Mostrar el toast
+      const toast = document.querySelector("#toastErrorCancelarPractica");
+      toast.classList.add("show");
+
+      // Ocultar el toast después de 7 segundos
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 7000);
+    }
   }
-}
-
-
 </script>
 
 <!-- Nav lateral -->
@@ -107,6 +151,130 @@ async function cancelarPractica(id_profesor, fecha, hora) {
     <div class="col mt-5 mb-3">
       <div>
         <h3 class="text-uppercase text-center">Bienvenido a tu autoescuela</h3>
+
+        <div class="toast-container position-static">
+          <!-- Toast Reservar Práctica -->
+
+          <div
+            class="toast bg-success"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastReservarPractica"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación exitosa!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              Has reservado una práctica con éxito. Puedes verla en tu historial
+            </div>
+          </div>
+
+          <!-- Toast Error Reservar Práctica -->
+
+          <div
+            class="toast bg-danger"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastErrorReservarPractica"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación fallida!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              No has podido reservar la práctica. Porfavor intentalo de nuevo o
+              recarga la página
+            </div>
+          </div>
+
+          <!-- Toast Cancelar Práctica -->
+
+          <div
+            class="toast bg-success"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastCancelarPractica"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación exitosa!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              Práctica cancelada con éxito
+            </div>
+          </div>
+
+          <!-- Toast Error Cancelar Práctica -->
+
+          <div
+            class="toast bg-danger"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastErrorCancelarPractica"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación fallida!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              Error al cancelar la práctica. Inténtalo de nuevo o recarga la
+              página
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -279,7 +447,7 @@ async function cancelarPractica(id_profesor, fecha, hora) {
                               .includes(filtro)) && practica.id_alumno === null;
                       }) as practica, i}
                       <tr>
-                        <td>{i + 1}</td>
+                        <td><b>{i + 1}</b></td>
                         <td>{format(new Date(practica.fecha), "dd-MM-yyyy")}</td
                         >
                         <td>{practica.hora.slice(0, 5)}</td>

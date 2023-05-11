@@ -380,6 +380,15 @@
       console.error(err.message);
     }
   }
+
+  /* Obtener nombre y apellidos del alumno que reserva la practica */
+
+  async function obtenerNombreApellido(idAlumno) {
+    const response = await fetch(URL.practica + "nombre/apellidos/" + idAlumno);
+    const data = await response.json();
+    const alumno = data[0]; // Suponiendo que la respuesta siempre incluye solo un alumno
+    return alumno;
+  }
 </script>
 
 <!-- Nav lateral -->
@@ -1176,10 +1185,23 @@
                             <option value="de">DE</option>
                           </select>
                         </td>
-
-                        <td style="color: {practica.alumno ? 'inherit' : 'red'}"
-                          >{practica.id_alumno || "Sin reservar"}</td
+                        <td
+                          style="color: {practica.alumno ? 'inherit' : 'red'}"
                         >
+                          {#if practica.id_alumno}
+                            {#await obtenerNombreApellido(practica.id_alumno) then nombreApellido}
+                              <span style="color: blue"
+                                >{nombreApellido.nombre}
+                                {nombreApellido.apellidos}</span
+                              >
+                            {:catch error}
+                              Error: {error.message}
+                            {/await}
+                          {:else}
+                            Sin reservar
+                          {/if}
+                        </td>
+
                         <td>
                           <i
                             class="fa-solid fa-pen-to-square fa-2x i-edit"
