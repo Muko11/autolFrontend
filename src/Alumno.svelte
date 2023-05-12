@@ -13,6 +13,7 @@
   let practica = "";
   let practicas = [];
   let historial = [];
+  let comunicados = [];
   let filtrarPracticas = "";
 
   async function datosAutoescuela() {
@@ -143,6 +144,31 @@
       }, 7000);
     }
   }
+
+  /* Calcular precio practicas */
+  async function calcularPrecio(event) {
+    event.preventDefault();
+    const practicaCompletada =
+      +document.getElementById("practicaCompletada").value;
+    const precioPorClase = +document.getElementById(
+      "practicaAutoescuelaHistorial"
+    ).value;
+    const totalPracticasInput = document.getElementById("totalPracticas");
+
+    const total = practicaCompletada * precioPorClase;
+
+    totalPracticasInput.value = `${total}€`;
+  }
+
+  /* Mostrar comunicados */
+  async function obtenerComunicados() {
+    const response = await fetch(URL.comunicado + "alumnos/" + id_autoescuela);
+    const data = await response.json();
+    comunicados = Object.values(data);
+    console.log(comunicados);
+  }
+
+  onMount(obtenerComunicados);
 </script>
 
 <!-- Nav lateral -->
@@ -377,7 +403,7 @@
                       id="practicaAutoescuela"
                       name="practica"
                       step=".01"
-                      value={practica}
+                      value={practica + "€"}
                       disabled
                     />
                   </div>
@@ -390,17 +416,22 @@
             <div class="tab-pane fade show px-4" id="nav-comunicado">
               <h4 class="mb-4">Comunicados</h4>
 
-              <div class="row row-cols-1">
-                <div class="comunicados mb-5">
-                  <h5>Examen práctico día 30 de enero de 2023</h5>
-                  <h6>Mari Carmen</h6>
-                  <p><small>20/10/2023</small></p>
-                  <p>
-                    Para presentaros al examen práctico debéis de realizar el
-                    pago en la autoescuela antes del día 25 de enero de 2023.
-                    Gracias.
-                  </p>
-                </div>
+              <div class="row row-cols row-cols-sm row-cols-md-1 row-cols-lg-2">
+                {#each comunicados as comunicado}
+                  <div class="comunicados mb-5">
+                    <h4><b>{comunicado.titulo}</b></h4>
+                    <h6><b>{comunicado.profesor.nombre} {comunicado.profesor.apellidos}</b></h6>
+                    <p>
+                      <small
+                        >{format(
+                          new Date(comunicado.fecha),
+                          "dd-MM-yyyy"
+                        )}</small
+                      >
+                    </p>
+                    <p>{comunicado.mensaje}</p>
+                  </div>
+                {/each}
               </div>
             </div>
 
@@ -495,7 +526,7 @@
                   <tbody>
                     {#each historial as practica, i}
                       <tr>
-                        <td>{i + 1}</td>
+                        <td><b>{i + 1}</b></td>
                         <td>{format(new Date(practica.fecha), "dd-MM-yyyy")}</td
                         >
                         <td>{practica.hora.slice(0, 5)}</td>
@@ -556,10 +587,11 @@
                       >Precio por clase práctica</label
                     >
                     <input
-                      type="text"
+                      type="number"
                       class="form-control"
                       id="practicaAutoescuelaHistorial"
                       step=".01"
+                      value={practica}
                       disabled
                     />
                   </div>
@@ -576,7 +608,9 @@
                     />
                   </div>
                   <div>
-                    <input class="boton" type="submit" value="Calcular" />
+                    <button class="boton" on:click={calcularPrecio}
+                      >Calcular</button
+                    >
                   </div>
                 </div>
               </form>

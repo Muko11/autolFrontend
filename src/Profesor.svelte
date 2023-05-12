@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { getContext } from "svelte";
   import { format } from "date-fns";
+  import { each } from "svelte/internal";
 
   const URL = getContext("URL");
   const user = JSON.parse(localStorage.getItem("user"));
@@ -14,6 +15,7 @@
   let profesores = [];
   let alumnos = [];
   let practicas = [];
+  let comunicados = [];
   let filtrarProfesores = "";
   let filtrarAlumnos = "";
   let filtrarPracticas = "";
@@ -389,6 +391,107 @@
     const alumno = data[0]; // Suponiendo que la respuesta siempre incluye solo un alumno
     return alumno;
   }
+
+  /* Crear un comunicado */
+
+  async function crearComunicado(event) {
+    event.preventDefault(); // Evitar que se envíe el formulario
+
+    const form = event.target; // Obtener el formulario actual
+
+    // Obtener los valores de los campos de entrada
+    const titulo = form.comunicadoTitulo.value;
+    const mensaje = form.comunicadoMensaje.value;
+
+    if (!titulo || !mensaje || titulo === "" || mensaje === "") {
+      // Mostrar el toast de error
+      const toast = document.querySelector("#toastErrorAgregarComunicado");
+      toast.classList.add("show");
+
+      // Ocultar el toast después de 7 segundos
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 7000);
+
+      return; // Salir de la función si no se proporcionó el título o el mensaje
+    }
+
+    try {
+      const response = await fetch(URL.comunicado + id_usuario, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          titulo,
+          mensaje,
+        }),
+      });
+
+      let data = {};
+      if (response.ok) {
+        data = await response.json();
+        console.log("Insertado con éxito el comunicado");
+        obtenerComunicados();
+
+        // Mostrar el toast de éxito
+        const toast = document.querySelector("#toastAgregarComunicado");
+        toast.classList.add("show");
+
+        // Ocultar el toast después de 7 segundos
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 7000);
+      } else {
+        console.log("No se ha insertado el comunicado");
+
+        // Mostrar el toast de error
+        const toast = document.querySelector("#toastErrorAgregarComunicado");
+        toast.classList.add("show");
+
+        // Ocultar el toast después de 7 segundos
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 7000);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  /* Mostrar comunicados */
+  async function obtenerComunicados() {
+    const response = await fetch(URL.comunicado + id_usuario);
+    const data = await response.json();
+    comunicados = Object.values(data);
+    console.log(comunicados);
+  }
+
+  onMount(obtenerComunicados);
+
+  /* Borrar comunicdo */
+
+  async function borrarComunicado(idComunicado) {
+    const response = await fetch(URL.comunicado + idComunicado, {
+      method: "DELETE",
+    });
+
+    if (response.ok) {
+      // Si se eliminó el comunicado correctamente, volvemos a cargar la lista
+      obtenerComunicados();
+
+      // Mostrar el toast
+      const toast = document.querySelector("#toastBorrarComunicado");
+      toast.classList.add("show");
+
+      // Ocultar el toast después de 7 segundos
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 7000);
+    } else {
+      console.log("Error al borrar el comunicado");
+    }
+  }
 </script>
 
 <!-- Nav lateral -->
@@ -699,6 +802,97 @@
             </div>
             <div class="toast-body text-white">
               Se ha borrado con éxito la práctica
+            </div>
+          </div>
+
+          <!-- Toast Agregar comunicado -->
+
+          <div
+            class="toast bg-success"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastAgregarComunicado"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación exitosa!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              Se ha publicado el comunicado correctamente
+            </div>
+          </div>
+
+          <!-- Toast Error Agregar comunicado -->
+
+          <div
+            class="toast bg-danger"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastErrorAgregarComunicado"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación fallida!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              No se ha podido publicar el comunicado porque faltan datos o ha
+              ocurrido un error inesperado
+            </div>
+          </div>
+
+          <!-- Toast Borrar profesor -->
+
+          <div
+            class="toast bg-success"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastBorrarComunicado"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación exitosa!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              Se ha borrado con éxito el comunicado
             </div>
           </div>
         </div>
@@ -1231,7 +1425,7 @@
             <div class="tab-pane fade show px-4" id="nav-comunicado">
               <h4 class="mb-4">Crear un comunicado</h4>
 
-              <form class="mb-5">
+              <form class="mb-5" on:submit={crearComunicado}>
                 <div class="row">
                   <div class="col">
                     <div class="mb-3">
@@ -1265,30 +1459,31 @@
 
               <h4 class="mb-4">Lista de comunicados</h4>
 
-              <div class="row row-cols">
-                <div class="comunicados mb-5">
-                  <h5>Examen práctico día 30 de enero de 2023</h5>
-                  <h6>Mari Carmen</h6>
-                  <p><small>20/10/2023</small></p>
-                  <p>
-                    Para presentaros al examen práctico debéis de realizar el
-                    pago en la autoescuela antes del día 25 de enero de 2023.
-                    Gracias.
-                  </p>
-                  <a
-                    href="#"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalEditarComunicado"
-                    ><i class="fa-solid fa-pen-to-square fa-2x i-edit" /></a
-                  >
+              <div class="row row-cols row-cols-sm row-cols-md-1 row-cols-lg-2">
+                {#each comunicados as comunicado}
+                  <div class="comunicados mb-5">
+                    <h4><b>{comunicado.titulo}</b></h4>
+                    <p>
+                      <small
+                        >{format(
+                          new Date(comunicado.fecha),
+                          "dd-MM-yyyy"
+                        )}</small
+                      >
+                    </p>
+                    <p>{comunicado.mensaje}</p>
+                    <i
+                      class="fa-solid fa-pen-to-square fa-2x i-edit"
+                      type="button"
+                    />
 
-                  <a
-                    href="#"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalBorrarComunicado"
-                    ><i class="fa-solid fa-trash fa-2x i-trash" /></a
-                  >
-                </div>
+                    <i
+                      class="fa-solid fa-trash fa-2x i-trash"
+                      type="button"
+                      on:click={() => borrarComunicado(comunicado.id_comunicado)}
+                    />
+                  </div>
+                {/each}
               </div>
             </div>
           </div>
