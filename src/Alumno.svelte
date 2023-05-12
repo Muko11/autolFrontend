@@ -416,7 +416,7 @@
             <div class="tab-pane fade show px-4" id="nav-comunicado">
               <h4 class="mb-4">Comunicados</h4>
 
-              <div class="row row-cols row-cols-sm row-cols-md-1 row-cols-lg-2">
+              <div class="row row-cols">
                 {#each comunicados as comunicado}
                   <div class="comunicados mb-5">
                     <h4><b>{comunicado.titulo}</b></h4>

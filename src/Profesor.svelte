@@ -492,6 +492,33 @@
       console.log("Error al borrar el comunicado");
     }
   }
+
+  /* Actualizar comunicado */
+
+  async function actualizarComunicado(event) {
+    const id_comunicado = event.target.dataset.id;
+    const titulo = document.querySelector(
+      `input[data-id="${id_comunicado}"]`
+    ).value;
+    const mensaje = document.querySelector(
+      `textarea[data-id="${id_comunicado}"]`
+    ).value;
+
+    const response = await fetch(URL.comunicado + id_comunicado, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ titulo, mensaje }),
+    });
+
+    if (response.ok) {
+      const comunicadoActualizado = await response.json();
+      console.log("Comunicado actualizado:", comunicadoActualizado);
+    } else {
+      console.error("Error al actualizar el comunicado");
+    }
+  }
 </script>
 
 <!-- Nav lateral -->
@@ -1459,10 +1486,20 @@
 
               <h4 class="mb-4">Lista de comunicados</h4>
 
-              <div class="row row-cols row-cols-sm row-cols-md-1 row-cols-lg-2">
+              <div class="row row-cols">
                 {#each comunicados as comunicado}
                   <div class="comunicados mb-5">
-                    <h4><b>{comunicado.titulo}</b></h4>
+                    <!-- <h4><b>{comunicado.titulo}</b></h4> -->
+                    <div class="mb-3">
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Título del comunicado"
+                        value={comunicado.titulo}
+                        data-id={comunicado.id_comunicado}
+                      />
+                    </div>
+
                     <p>
                       <small
                         >{format(
@@ -1471,16 +1508,28 @@
                         )}</small
                       >
                     </p>
-                    <p>{comunicado.mensaje}</p>
+                    <div class="mb-3">
+                      <textarea
+                        class="form-control"
+                        rows="5"
+                        placeholder="Escribe tu comunicado..."
+                        value={comunicado.mensaje}
+                        data-id={comunicado.id_comunicado}
+                      />
+                    </div>
+                    <!-- <p>{comunicado.mensaje}</p> -->
                     <i
                       class="fa-solid fa-pen-to-square fa-2x i-edit"
                       type="button"
+                      on:click={actualizarComunicado}
+                      data-id={comunicado.id_comunicado}
                     />
 
                     <i
                       class="fa-solid fa-trash fa-2x i-trash"
                       type="button"
-                      on:click={() => borrarComunicado(comunicado.id_comunicado)}
+                      on:click={() =>
+                        borrarComunicado(comunicado.id_comunicado)}
                     />
                   </div>
                 {/each}
