@@ -515,6 +515,14 @@
     if (response.ok) {
       const comunicadoActualizado = await response.json();
       console.log("Comunicado actualizado:", comunicadoActualizado);
+      // Mostrar el toast
+      const toast = document.querySelector("#toastActualizarComunicado");
+      toast.classList.add("show");
+
+      // Ocultar el toast después de 7 segundos
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 7000);
     } else {
       console.error("Error al actualizar el comunicado");
     }
@@ -920,6 +928,36 @@
             </div>
             <div class="toast-body text-white">
               Se ha borrado con éxito el comunicado
+            </div>
+          </div>
+
+          <!-- Toast actualizar comunicado -->
+
+          <div
+            class="toast bg-success"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastActualizarComunicado"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación exitosa!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              Se ha actualizado el comunicado con éxito
             </div>
           </div>
         </div>
@@ -1492,8 +1530,9 @@
                     <!-- <h4><b>{comunicado.titulo}</b></h4> -->
                     <div class="mb-3">
                       <input
+                        style="font-weight: bold;"
                         type="text"
-                        class="form-control"
+                        class="form-control inputEdit"
                         placeholder="Título del comunicado"
                         value={comunicado.titulo}
                         data-id={comunicado.id_comunicado}
@@ -1501,7 +1540,7 @@
                     </div>
 
                     <p>
-                      <small
+                      <small style="margin-left: 10px;"
                         >{format(
                           new Date(comunicado.fecha),
                           "dd-MM-yyyy"
@@ -1510,8 +1549,8 @@
                     </p>
                     <div class="mb-3">
                       <textarea
-                        class="form-control"
-                        rows="5"
+                        class="form-control inputEdit"
+                        rows="4"
                         placeholder="Escribe tu comunicado..."
                         value={comunicado.mensaje}
                         data-id={comunicado.id_comunicado}
@@ -1652,5 +1691,12 @@
   .boton-borrar:hover {
     background-color: red;
     color: white;
+  }
+
+  /* Inputs */
+
+  .inputEdit {
+    border: 0;
+    background-color: whitesmoke;
   }
 </style>
