@@ -348,33 +348,42 @@
 
   /* Actualizar una practica */
 
-  async function actualizarPractica(
-    id_profesor,
-    fecha,
-    hora,
-    tipo,
-    nuevaFecha,
-    nuevaHora,
-    nuevotipo
-  ) {
+  async function actualizarPractica(event) {
+    const id_practica = event.target.dataset.id;
+
+    const fecha = document.querySelector(
+      `input[data-id="${id_practica}-fecha"]`
+    ).value;
+    const hora = document.querySelector(
+      `input[data-id="${id_practica}-hora"]`
+    ).value;
+    const tipo = document.querySelector(
+      `select[data-id="${id_practica}-tipo"]`
+    ).value;
+
     try {
-      const res = await fetch(
-        URL.practica + id_profesor + "/" + fecha + "/" + hora + "/" + tipo,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            nuevaFecha: nuevaFecha,
-            nuevaHora: nuevaHora,
-            nuevotipo: nuevotipo,
-          }),
-        }
-      );
+      const res = await fetch(URL.practica + id_practica, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fecha,
+          hora,
+          tipo,
+        }),
+      });
 
       if (res.status === 200) {
         console.log("Práctica actualizada correctamente");
+        // Mostrar el toast
+        const toast = document.querySelector("#toastActualizarPractica");
+        toast.classList.add("show");
+
+        // Ocultar el toast después de 7 segundos
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 7000);
       } else {
         console.error("Error al actualizar la práctica");
       }
@@ -960,6 +969,36 @@
               Se ha actualizado el comunicado con éxito
             </div>
           </div>
+
+          <!-- Toast actualizar practica -->
+
+          <div
+            class="toast bg-success"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="toastActualizarPractica"
+          >
+            <div class="toast-header">
+              <img
+                src="imagenes/logo.svg"
+                style="width: 30px;"
+                class="rounded me-2"
+                alt="Logo"
+              />
+              <strong class="me-auto">¡Operación exitosa!</strong>
+              <small class="text-muted">AutoL</small>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="toast"
+                aria-label="Close"
+              />
+            </div>
+            <div class="toast-body text-white">
+              Se ha actualizado la práctica con éxito
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1406,26 +1445,26 @@
                           <input
                             type="date"
                             class="form-control"
-                            id="nuevaFecha"
                             value={format(
                               new Date(practica.fecha),
                               "yyyy-MM-dd"
                             )}
+                            data-id={practica.id_practica + "-fecha"}
                           />
                         </td>
                         <td>
                           <input
                             type="time"
                             class="form-control"
-                            id="nuevaHora"
-                            value={practica.hora.slice(0, 5)}
+                            value={practica.hora}
+                            data-id={practica.id_practica + "-hora"}
                           />
                         </td>
                         <td>
                           <select
-                            id="nuevoTipo"
                             class="form-control-sm"
                             value={practica.tipo}
+                            data-id={practica.id_practica + "-tipo"}
                           >
                             <option value="am">AM</option>
                             <option value="a1">A1</option>
@@ -1465,6 +1504,8 @@
                           <i
                             class="fa-solid fa-pen-to-square fa-2x i-edit"
                             type="button"
+                            on:click={actualizarPractica}
+                            data-id={practica.id_practica}
                           />
 
                           <i
