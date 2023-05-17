@@ -5,7 +5,7 @@
 	import Contenido from "./Contenido.svelte";
 	import Footer from "./Footer.svelte";
 
-	const URL = {
+	/* const URL = {
 		usuarios: "http://localhost:3000/autol/usuarios/",
 		login: "http://localhost:3000/autol/login/",
 		singup: "http://localhost:3000/autol/singup/",
@@ -15,9 +15,9 @@
 		alumno: "http://localhost:3000/autol/alumno/",
 		practica: "http://localhost:3000/autol/practica/",
 		comunicado: "http://localhost:3000/autol/comunicado/",
-	};
+	}; */
 
-	/* const URL = {
+	const URL = {
 		usuarios: "https://autolbackend.onrender.com/autol/usuarios/",
 		login: "https://autolbackend.onrender.com/autol/login/",
 		singup: "https://autolbackend.onrender.com/autol/singup/",
@@ -27,7 +27,7 @@
 		alumno: "https://autolbackend.onrender.com/autol/alumno/",
 		practica: "https://autolbackend.onrender.com/autol/practica/",
 		comunicado: "https://autolbackend.onrender.com/autol/comunicado/",
-	}; */
+	};
 
 	setContext("URL", URL);
 </script>
