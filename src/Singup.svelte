@@ -39,15 +39,6 @@
       } else {
         document.getElementById("error").innerHTML = "Rellena y revise todos los campos"
         console.log("No se ha registrado al usuario");
-
-        // Mostrar el toast de error
-        const toast = document.querySelector("#toastErrorAgregarComunicado");
-        toast.classList.add("show");
-
-        // Ocultar el toast después de 7 segundos
-        setTimeout(() => {
-          toast.classList.remove("show");
-        }, 7000);
       }
     } catch (error) {
       console.error(error);
