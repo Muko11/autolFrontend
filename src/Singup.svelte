@@ -32,7 +32,23 @@
       });
 
       const data = await response.json();
-      window.location.href = "/login";
+
+      if (response.ok) {
+        console.log("Usuario creado con éxito");
+        window.location.href = "/login";
+      } else {
+        document.getElementById("error").innerHTML = "Rellena y revise todos los campos"
+        console.log("No se ha registrado al usuario");
+
+        // Mostrar el toast de error
+        const toast = document.querySelector("#toastErrorAgregarComunicado");
+        toast.classList.add("show");
+
+        // Ocultar el toast después de 7 segundos
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 7000);
+      }
     } catch (error) {
       console.error(error);
     }
@@ -42,10 +58,9 @@
 <div class="container my-5">
   <Link to="/" class="boton my-4">⬅ Volver</Link>
 </div>
-
 <div class="container formulario">
   <p class="fs-4 text-center">CREAR CUENTA</p>
-
+  <p id="error" style="color: red; font-weight: bold; text-align: center;"></p>
   <form on:submit={handleFormSubmit}>
     <input
       type="text"

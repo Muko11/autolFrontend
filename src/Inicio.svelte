@@ -158,7 +158,7 @@
               alert("Error al asignar el profesor como administrador");
             } else {
               // La autoescuela ha sido creada correctamente
-              window.location.href = "/";
+              window.location.href = "/profesor";
             }
           } catch (error) {
             console.error(error);
