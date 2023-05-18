@@ -65,6 +65,11 @@
             </div>
         </div>
     </div>
+
+    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Licencia de Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br /><br />
+
+
+
     <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2)">
         &copy; 2023 Copyright - AutoL
     </div>
