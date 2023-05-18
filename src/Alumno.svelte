@@ -15,6 +15,8 @@
   let historial = [];
   let comunicados = [];
   let filtrarPracticas = "";
+  let historialIdSeleccionado;
+  let modalHistorial;
 
   async function datosAutoescuela() {
     const response = await fetch(URL.autoescuela + id_autoescuela);
@@ -122,6 +124,7 @@
       console.log(data);
       obtenerHistorial();
       obtenerPracticas();
+      modalHistorial.hide();
 
       // Mostrar el toast
       const toast = document.querySelector("#toastCancelarPractica");
@@ -169,6 +172,18 @@
   }
 
   onMount(obtenerComunicados);
+
+
+  onMount(() => {
+    // Inicializar la modal cuando el componente se monta
+    modalHistorial = new bootstrap.Modal(
+      document.getElementById("modalBorrarRegistroHistorial"),
+      {
+        backdrop: "static", // Evitar que se cierre al hacer clic fuera de la modal
+        keyboard: false, // Evitar que se cierre al presionar la tecla Escape
+      }
+    );
+  });
 </script>
 
 <!-- Nav lateral -->
@@ -536,7 +551,7 @@
                           {practica.profesor.data.apellidos}</td
                         >
                         <td>
-                          <i
+                          <!-- <i
                             class="fa-solid fa-trash fa-2x i-trash"
                             type="button"
                             on:click={() =>
@@ -545,8 +560,16 @@
                                 practica.fecha,
                                 practica.hora
                               )}
-                          /></td
-                        >
+                          /> -->
+
+                          <i
+                            class="fa-solid fa-trash fa-2x i-trash"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalBorrarRegistroHistorial"
+                            on:click={() => (historialIdSeleccionado = practica)}
+                          />
+                          </td>
                       </tr>
                     {/each}
                   </tbody>
@@ -616,6 +639,44 @@
               </form>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal borrar practica -->
+
+<div
+  class="modal fade"
+  id="modalBorrarRegistroHistorial"
+  tabindex="-1"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header border-bottom-0">
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        />
+      </div>
+      <div class="modal-body text-center">
+        <p class="fs-3">Cancelar práctica</p>
+        <p class="text-muted">¿Estás seguro de cancelar la práctica? Podrás volver a reservarla en la pestaña "Prácticas"</p>
+        <div class="d-flex justify-content-center mb-3 g-2">
+          <button
+            id="botonBorrarRegistro"
+            class="boton-borrar"
+            on:click={() =>
+              cancelarPractica(
+                historialIdSeleccionado.id_profesor,
+                historialIdSeleccionado.fecha,
+                historialIdSeleccionado.hora
+              )}>Cancelar práctica</button
+          >
         </div>
       </div>
     </div>

@@ -19,6 +19,15 @@
   let filtrarProfesores = "";
   let filtrarAlumnos = "";
   let filtrarPracticas = "";
+  let profesorIdSeleccionado;
+  let alumnoIdSeleccionado;
+  let practicaIdSeleccionada;
+  let comunicadoIdSeleccionado;
+  let modalAutoescuela;
+  let modalProfesor;
+  let modalAlumno;
+  let modalPractica;
+  let modalComunicado;
 
   onMount(async () => {
     try {
@@ -74,6 +83,20 @@
     } else {
       // Manejar errores
       console.error("Ha ocurrido un error al actualizar la autoescuela");
+    }
+  }
+
+  /* Borrar autoescuela */
+  async function borrarAutoescuela() {
+    const response = await fetch(URL.autoescuela + id_autoescuela, {
+      method: "DELETE",
+    });
+
+    if (response.ok) {
+      modalAutoescuela.hide();
+      window.location.href = "/logout";
+    } else {
+      console.error("Error al eliminar la autoescuela");
     }
   }
 
@@ -147,6 +170,7 @@
     if (response.ok) {
       // Si se eliminó el profesor correctamente, volvemos a cargar la lista
       obtenerProfesores();
+      modalProfesor.hide();
 
       // Mostrar el toast
       const toast = document.querySelector("#toastBorrarProfesor");
@@ -241,6 +265,7 @@
       // Si se eliminó el alumno correctamente, volvemos a cargar la lista
       obtenerAlumnos();
       obtenerPracticas();
+      modalAlumno.hide();
 
       // Mostrar el toast
       const toast = document.querySelector("#toastBorrarAlumno");
@@ -330,6 +355,7 @@
     if (response.ok) {
       // Si se eliminó la practica correctamente, volvemos a cargar la lista
       obtenerPracticas();
+      modalPractica.hide();
 
       // Mostrar el toast
       const toast = document.querySelector("#toastBorrarPractica");
@@ -488,6 +514,7 @@
     if (response.ok) {
       // Si se eliminó el comunicado correctamente, volvemos a cargar la lista
       obtenerComunicados();
+      modalComunicado.hide();
 
       // Mostrar el toast
       const toast = document.querySelector("#toastBorrarComunicado");
@@ -536,6 +563,49 @@
       console.error("Error al actualizar el comunicado");
     }
   }
+
+  onMount(() => {
+    // Inicializar la modal cuando el componente se monta
+    modalAutoescuela = new bootstrap.Modal(
+      document.getElementById("modalBorrarRegistroAutoescuela"),
+      {
+        backdrop: "static", // Evitar que se cierre al hacer clic fuera de la modal
+        keyboard: false, // Evitar que se cierre al presionar la tecla Escape
+      }
+    );
+
+    modalProfesor = new bootstrap.Modal(
+      document.getElementById("modalBorrarRegistroProfesor"),
+      {
+        backdrop: "static", // Evitar que se cierre al hacer clic fuera de la modal
+        keyboard: false, // Evitar que se cierre al presionar la tecla Escape
+      }
+    );
+
+    modalAlumno = new bootstrap.Modal(
+      document.getElementById("modalBorrarRegistroAlumno"),
+      {
+        backdrop: "static", // Evitar que se cierre al hacer clic fuera de la modal
+        keyboard: false, // Evitar que se cierre al presionar la tecla Escape
+      }
+    );
+
+    modalPractica = new bootstrap.Modal(
+      document.getElementById("modalBorrarRegistroPractica"),
+      {
+        backdrop: "static", // Evitar que se cierre al hacer clic fuera de la modal
+        keyboard: false, // Evitar que se cierre al presionar la tecla Escape
+      }
+    );
+
+    modalComunicado = new bootstrap.Modal(
+      document.getElementById("modalBorrarRegistroComunicado"),
+      {
+        backdrop: "static", // Evitar que se cierre al hacer clic fuera de la modal
+        keyboard: false, // Evitar que se cierre al presionar la tecla Escape
+      }
+    );
+  });
 </script>
 
 <!-- Nav lateral -->
@@ -1131,15 +1201,23 @@
                   </div>
                 {/if}
                 <br />
-                <!-- <div class="d-flex justify-content-end">
-                  <a
+                {#if es_administrador}
+                  <div class="d-flex justify-content-end">
+                    <!-- <a
                     href="#"
                     class="boton-borrar"
                     data-bs-toggle="modal"
                     data-bs-target="#modalBorrarAutoescuela"
                     >Borrar autoescuela</a
-                  >
-                </div> -->
+                  > -->
+                    <button
+                      class="boton-borrar"
+                      type="button"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modalBorrarRegistroAutoescuela"
+                    >Borrar autoescuela</button>
+                  </div>
+                {/if}
               </form>
             </div>
 
@@ -1217,11 +1295,20 @@
                                 <b class="ms-1">Administrador</b>
                               </div>
                             {:else}
-                              <i
+                              <!-- <i
                                 class="fa-solid fa-trash fa-2x i-trash"
                                 type="button"
                                 on:click={() =>
                                   borrarProfesor(profesor.id_profesor)}
+                              /> -->
+                              <i
+                                class="fa-solid fa-trash fa-2x i-trash"
+                                type="button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalBorrarRegistroProfesor"
+                                on:click={() =>
+                                  (profesorIdSeleccionado =
+                                    profesor.id_profesor)}
                               />
                             {/if}
                           </td>
@@ -1306,10 +1393,19 @@
                         <td>{alumno.correo}</td>
                         {#if es_administrador}
                           <td>
-                            <i
+                            <!-- <i
                               class="fa-solid fa-trash fa-2x i-trash"
                               type="button"
                               on:click={() => borrarAlumno(alumno.id_alumno)}
+                            /> -->
+
+                            <i
+                              class="fa-solid fa-trash fa-2x i-trash"
+                              type="button"
+                              data-bs-toggle="modal"
+                              data-bs-target="#modalBorrarRegistroAlumno"
+                              on:click={() =>
+                                (alumnoIdSeleccionado = alumno.id_alumno)}
                             />
                           </td>
                         {/if}
@@ -1508,7 +1604,7 @@
                             data-id={practica.id_practica}
                           />
 
-                          <i
+                          <!-- <i
                             class="fa-solid fa-trash fa-2x i-trash"
                             type="button"
                             on:click={() =>
@@ -1517,6 +1613,13 @@
                                 practica.fecha,
                                 practica.hora
                               )}
+                          /> -->
+                          <i
+                            class="fa-solid fa-trash fa-2x i-trash"
+                            type="button"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalBorrarRegistroPractica"
+                            on:click={() => (practicaIdSeleccionada = practica)}
                           />
                         </td>
                       </tr>
@@ -1605,17 +1708,204 @@
                       data-id={comunicado.id_comunicado}
                     />
 
-                    <i
+                    <!-- <i
                       class="fa-solid fa-trash fa-2x i-trash"
                       type="button"
                       on:click={() =>
                         borrarComunicado(comunicado.id_comunicado)}
+                    /> -->
+
+                    <i
+                      class="fa-solid fa-trash fa-2x i-trash"
+                      type="button"
+                      data-bs-toggle="modal"
+                      data-bs-target="#modalBorrarRegistroComunicado"
+                      on:click={() =>
+                        (comunicadoIdSeleccionado = comunicado.id_comunicado)}
                     />
                   </div>
                 {/each}
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal borrar autoescuela -->
+<div
+  class="modal fade"
+  id="modalBorrarRegistroAutoescuela"
+  tabindex="-1"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header border-bottom-0">
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        />
+      </div>
+      <div class="modal-body text-center">
+        <p class="fs-3">Borrar autoescuela</p>
+        <p class="text-muted">
+          ¿Estás seguro de borrar toda tu autoescuela? No podrás recuperar los
+          datos. Tu sesión se cerrará
+        </p>
+        <div class="d-flex justify-content-center mb-3 g-2">
+          <button
+            id="botonBorrarRegistro"
+            class="boton-borrar"
+            on:click={() => borrarAutoescuela()}>Borrar autoescuela</button
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal borrar profesor -->
+<div
+  class="modal fade"
+  id="modalBorrarRegistroProfesor"
+  tabindex="-1"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header border-bottom-0">
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        />
+      </div>
+      <div class="modal-body text-center">
+        <p class="fs-3">Borrar profesor</p>
+        <p class="text-muted">
+          ¿Estás seguro de borrar el registro del profesor?
+        </p>
+        <div class="d-flex justify-content-center mb-3 g-2">
+          <button
+            id="botonBorrarRegistro"
+            class="boton-borrar"
+            on:click={() => borrarProfesor(profesorIdSeleccionado)}
+            >Borrar profesor</button
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal borrar alumno -->
+
+<div
+  class="modal fade"
+  id="modalBorrarRegistroAlumno"
+  tabindex="-1"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header border-bottom-0">
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        />
+      </div>
+      <div class="modal-body text-center">
+        <p class="fs-3">Borrar alumno</p>
+        <p class="text-muted">
+          ¿Estás seguro de borrar el registro del alumno?
+        </p>
+        <div class="d-flex justify-content-center mb-3 g-2">
+          <button
+            id="botonBorrarRegistro"
+            class="boton-borrar"
+            on:click={() => borrarAlumno(alumnoIdSeleccionado)}
+            >Borrar alumno</button
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal borrar practica -->
+
+<div
+  class="modal fade"
+  id="modalBorrarRegistroPractica"
+  tabindex="-1"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header border-bottom-0">
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        />
+      </div>
+      <div class="modal-body text-center">
+        <p class="fs-3">Borrar práctica</p>
+        <p class="text-muted">¿Estás seguro de borrar la práctica?</p>
+        <div class="d-flex justify-content-center mb-3 g-2">
+          <button
+            id="botonBorrarRegistro"
+            class="boton-borrar"
+            on:click={() =>
+              borrarPractica(
+                practicaIdSeleccionada.id_profesor,
+                practicaIdSeleccionada.fecha,
+                practicaIdSeleccionada.hora
+              )}>Borrar práctica</button
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal borrar comunicado -->
+
+<div
+  class="modal fade"
+  id="modalBorrarRegistroComunicado"
+  tabindex="-1"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header border-bottom-0">
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        />
+      </div>
+      <div class="modal-body text-center">
+        <p class="fs-3">Borrar comunicado</p>
+        <p class="text-muted">¿Estás seguro de borrar el comunicado?</p>
+        <div class="d-flex justify-content-center mb-3 g-2">
+          <button
+            id="botonBorrarRegistro"
+            class="boton-borrar"
+            on:click={() => borrarComunicado(comunicadoIdSeleccionado)}
+            >Borrar comunicado</button
+          >
         </div>
       </div>
     </div>
