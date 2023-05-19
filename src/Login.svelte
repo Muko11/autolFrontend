@@ -6,6 +6,7 @@
 
   let loginSuccess = false;
   let loginMessage = "";
+  let mostrarSpinner = false;
 
   /* async function login(correo, password) {
     const response = await fetch(URL.login, {
@@ -99,91 +100,106 @@
   } */
 
   async function login(correo, password) {
-    const response = await fetch(URL.login, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        correo,
-        password,
-      }),
-    });
+    try {
+      const response = await fetch(URL.login, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          correo,
+          password,
+        }),
+      });
 
-    const data = await response.json();
-    loginSuccess = data.success;
-    loginMessage = data.message;
+      const data = await response.json();
 
-    if (data.success) {
-      const user = {
-        id_usuario: data.id_usuario,
-        nombre: data.nombre,
-        apellidos: data.apellidos,
-        correo: data.correo,
-        rol: data.rol,
-      };
+      if (response.ok) {
+        console.log("Usuario login con éxito");
 
-      try {
-        if (user.rol === "profesor") {
-          // Consulta a la tabla 'profesores'
-          const profesorResponse = await fetch(URL.profesor + user.id_usuario, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-          const profesorData = await profesorResponse.json();
+        loginSuccess = data.success;
+        loginMessage = data.message;
 
-          if (profesorData.id_profesor) {
-            // Consulta a la tabla 'profesores_detalle'
-            const profesorDetailResponse = await fetch(
-              URL.profesor + profesorData.id_profesor,
-              {
+        if (data.success) {
+          const user = {
+            id_usuario: data.id_usuario,
+            nombre: data.nombre,
+            apellidos: data.apellidos,
+            correo: data.correo,
+            rol: data.rol,
+          };
+
+          try {
+            if (user.rol === "profesor") {
+              // Consulta a la tabla 'profesores'
+              const profesorResponse = await fetch(
+                URL.profesor + user.id_usuario,
+                {
+                  method: "GET",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                }
+              );
+              const profesorData = await profesorResponse.json();
+
+              if (profesorData.id_profesor) {
+                // Consulta a la tabla 'profesores_detalle'
+                const profesorDetailResponse = await fetch(
+                  URL.profesor + profesorData.id_profesor,
+                  {
+                    method: "GET",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  }
+                );
+                const profesorDetailData = await profesorDetailResponse.json();
+                const id_autoescuela = profesorDetailData.id_autoescuela;
+
+                user.id_autoescuela = id_autoescuela;
+              }
+            } else if (user.rol === "alumno") {
+              // Consulta a la tabla 'alumnos'
+              const alumnoResponse = await fetch(URL.alumno + user.id_usuario, {
                 method: "GET",
                 headers: {
                   "Content-Type": "application/json",
                 },
+              });
+              const alumnoData = await alumnoResponse.json();
+
+              if (alumnoData.id_alumno) {
+                // Consulta a la tabla 'autoescuelas_alumnos'
+                const autoescuelaAlumnoResponse = await fetch(
+                  URL.alumno + alumnoData.id_alumno,
+                  {
+                    method: "GET",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  }
+                );
+                const autoescuelaAlumnoData =
+                  await autoescuelaAlumnoResponse.json();
+                const id_autoescuela = autoescuelaAlumnoData.id_autoescuela;
+
+                user.id_autoescuela = id_autoescuela;
               }
-            );
-            const profesorDetailData = await profesorDetailResponse.json();
-            const id_autoescuela = profesorDetailData.id_autoescuela;
-
-            user.id_autoescuela = id_autoescuela;
-          }
-        } else if (user.rol === "alumno") {
-          // Consulta a la tabla 'alumnos'
-          const alumnoResponse = await fetch(URL.alumno + user.id_usuario, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-          const alumnoData = await alumnoResponse.json();
-
-          if (alumnoData.id_alumno) {
-            // Consulta a la tabla 'autoescuelas_alumnos'
-            const autoescuelaAlumnoResponse = await fetch(
-              URL.alumno + alumnoData.id_alumno,
-              {
-                method: "GET",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              }
-            );
-            const autoescuelaAlumnoData =
-              await autoescuelaAlumnoResponse.json();
-            const id_autoescuela = autoescuelaAlumnoData.id_autoescuela;
-
-            user.id_autoescuela = id_autoescuela;
+            }
+            localStorage.setItem("user", JSON.stringify(user));
+            window.location.href = "/";
+          } catch (error) {
+            console.error(error);
           }
         }
-
-        localStorage.setItem("user", JSON.stringify(user));
-        window.location.href = "/";
-      } catch (error) {
-        console.error(error);
+      } else {
+        document.getElementById("error").innerHTML =
+          "No se ha podido acceder a tu cuenta. Correo y/o contraseña incorrectos";
+        console.log("No se ha login al usuario");
       }
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -191,6 +207,7 @@
     event.preventDefault(); // Evitar que se envíe el formulario
 
     const form = event.target; // Obtener el formulario actual
+    mostrarSpinner = true;
 
     // Obtener los valores de los campos de entrada
     const correo = form.correo.value;
@@ -201,6 +218,8 @@
       await login(correo, password);
     } catch (error) {
       console.error(error);
+    } finally {
+      mostrarSpinner = false;
     }
   }
 </script>
@@ -232,6 +251,12 @@
 
 <div class="container formulario">
   <p class="fs-4 text-center">INICIAR SESIÓN</p>
+  {#if mostrarSpinner}
+    <div class="d-flex justify-content-center">
+      <div class="spinner-grow text-success" role="status" />
+    </div>
+  {/if}
+  <p id="error" style="color: red; font-weight: bold; text-align: center;" />
   <form on:submit={handleFormSubmit}>
     <input
       type="email"

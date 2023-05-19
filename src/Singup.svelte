@@ -4,10 +4,14 @@
 
   const URL = getContext("URL");
 
+  let mostrarSpinner = false;
+
   async function handleFormSubmit(event) {
     event.preventDefault(); // Evitar que se envíe el formulario
 
     const form = event.target; // Obtener el formulario actual
+
+    mostrarSpinner = true;
 
     // Obtener los valores de los campos de entrada
     const nombre = form.nombre.value;
@@ -36,12 +40,19 @@
       if (response.ok) {
         console.log("Usuario creado con éxito");
         window.location.href = "/login";
+      } else if (response.status === 409) {
+        document.getElementById("error").innerHTML =
+          "Ya existe un usuario con ese correo, introduzca otro";
+        console.log("Ya existe un usuario con ese correo");
       } else {
-        document.getElementById("error").innerHTML = "Rellena y revise todos los campos"
+        document.getElementById("error").innerHTML =
+          "Rellena y revise todos los campos";
         console.log("No se ha registrado al usuario");
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      mostrarSpinner = false;
     }
   }
 </script>
@@ -51,7 +62,12 @@
 </div>
 <div class="container formulario">
   <p class="fs-4 text-center">CREAR CUENTA</p>
-  <p id="error" style="color: red; font-weight: bold; text-align: center;"></p>
+  {#if mostrarSpinner}
+    <div class="d-flex justify-content-center">
+      <div class="spinner-grow text-success" role="status" />
+    </div>
+  {/if}
+  <p id="error" style="color: red; font-weight: bold; text-align: center;" />
   <form on:submit={handleFormSubmit}>
     <input
       type="text"

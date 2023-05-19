@@ -1215,7 +1215,8 @@
                       type="button"
                       data-bs-toggle="modal"
                       data-bs-target="#modalBorrarRegistroAutoescuela"
-                    >Borrar autoescuela</button>
+                      >Borrar autoescuela</button
+                    >
                   </div>
                 {/if}
               </form>
